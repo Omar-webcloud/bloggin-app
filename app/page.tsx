@@ -1,123 +1,103 @@
+
 "use client"
 
-import { useEffect, useState } from "react"
-import { onAuthStateChanged } from "firebase/auth"
-import { auth } from "@/lib/firebase"
-import Signup from "@/components/Signup"
-import Login from "@/components/Login"
-import Logout from "@/components/Logout"
-import CreateBlog from "@/components/CreateBlog"
-import BlogList from "@/components/BlogList"
-import { Button } from "@/components/ui/button"
-import { PenSquare } from "lucide-react"
+import { useState, useEffect } from "react"
+import useAuth from "../hooks/useAuth"
+import { auth, db } from "../lib/firebase"
+import { signOut } from "firebase/auth"
+import { collection, getDocs, query, where } from "firebase/firestore"
 
-export default function Home() {
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [showAuth, setShowAuth] = useState("login")
-  const [showCreateBlog, setShowCreateBlog] = useState(false)
+export default function Component() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isDarkMode, setIsDarkMode] = useState(false)
+  const { user } = useAuth()
+  const [posts, setPosts] = useState<any[]>([])
+  const [search, setSearch] = useState("")
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser)
-      setLoading(false)
-    })
+    const fetchPosts = async () => {
+      let q = query(collection(db, "posts"))
+      if (search) {
+        q = query(collection(db, "posts"), where("title", ">=", search), where("title", "<=", search + "\uf8ff"))
+      }
+      const querySnapshot = await getDocs(q)
+      const postsData = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      setPosts(postsData)
+    }
 
-    return () => unsubscribe()
+    fetchPosts()
+  }, [search])
+
+  useEffect(() => {
+    const isDark = document.documentElement.classList.contains("dark")
+    setIsDarkMode(isDark)
   }, [])
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Loading...</p>
-      </div>
-    )
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode)
+    document.documentElement.classList.toggle("dark")
+  }
+
+  const handleLogout = async () => {
+    await signOut(auth)
   }
 
   return (
-    <div className="min-h-screen">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <h1 className="text-4xl font-serif text-foreground">Bloggin'</h1>
-            <div className="flex items-center gap-4">
-              {user && (
-                <>
-                  <Button
-                    onClick={() => setShowCreateBlog(!showCreateBlog)}
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground"
-                  >
-                    <PenSquare className="w-4 h-4 mr-2" />
-                    {showCreateBlog ? "View Posts" : "New Post"}
-                  </Button>
-                  <Logout />
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-12">
-        {!user ? (
-          <div className="max-w-2xl mx-auto space-y-8">
-            <div className="text-center space-y-4 mb-12">
-              <h2 className="text-5xl font-serif text-balance leading-tight">Share your thoughts with the world</h2>
-              <p className="text-lg text-muted-foreground text-pretty">
-                A minimal, elegant platform for writers and readers
-              </p>
-            </div>
-
-            {showAuth === "login" ? (
-              <div className="space-y-4">
-                <Login onSuccess={() => setShowAuth("login")} />
-                <p className="text-center text-sm text-muted-foreground">
-                  Don't have an account?{" "}
-                  <button onClick={() => setShowAuth("signup")} className="text-primary hover:underline font-medium">
-                    Sign up
-                  </button>
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <Signup onSuccess={() => setShowAuth("login")} />
-                <p className="text-center text-sm text-muted-foreground">
-                  Already have an account?{" "}
-                  <button onClick={() => setShowAuth("login")} className="text-primary hover:underline font-medium">
-                    Sign in
-                  </button>
-                </p>
-              </div>
-            )}
-
-            <div className="mt-16">
-              <h3 className="text-2xl font-serif text-center mb-8">Recent Posts</h3>
-              <BlogList />
-            </div>
-          </div>
-        ) : (
-          <div className="max-w-3xl mx-auto space-y-8">
-            {showCreateBlog ? (
-              <CreateBlog user={user} />
+    <div className={isDarkMode ? "dark" : ""}>
+      <header className="header">
+        <div className="container">
+          <a href="/" className="logo">
+            BLOGGIN'
+          </a>
+          <nav className={`nav ${isMenuOpen ? "open" : ""}`}>
+            {user ? (
+              <>
+                <a href="/my-posts">My Posts</a>
+                <a href="/create-post">Create Post</a>
+                <button onClick={handleLogout} className="button">Log Out</button>
+              </>
             ) : (
               <>
-                <div className="text-center space-y-2">
-                  <h2 className="text-4xl font-serif">All Posts</h2>
-                  <p className="text-muted-foreground">Signed in as {user.email}</p>
-                </div>
-                <BlogList />
+                <a href="/login">Log in</a>
+                <a href="/signup" className="button">Sign up</a>
               </>
             )}
-          </div>
-        )}
+            <button onClick={toggleDarkMode} className="theme-toggle">
+              {isDarkMode ? "☀️" : "🌙"}
+            </button>
+          </nav>
+          <button className="menu-toggle" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            {isMenuOpen ? "✕" : "☰"}
+          </button>
+        </div>
+      </header>
+      <main className="container">
+        <div className="search-container">
+          <input type="search" placeholder="Search" value={search} onChange={(e) => setSearch(e.target.value)} />
+        </div>
+        <section className="post-grid">
+          {posts.map((post) => (
+            <div className="post-card" key={post.id}>
+              <img src={post.image} alt={post.title} />
+              <div className="post-content">
+                <h2>{post.title}</h2>
+                <p>{post.description}</p>
+                <a href={`/post/${post.id}`}>Read More</a>
+              </div>
+            </div>
+          ))}
+        </section>
       </main>
-
-      {/* Footer */}
-      <footer className="border-t border-border mt-24 py-8">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>Bloggin' — A modern minimal blog platform</p>
+      <footer className="footer">
+        <div className="container">
+          <p>&copy; BLOGGIN App by Omar. All rights reserved.</p>
+          <div className="footer-links">
+            <a href="#">Help</a>
+            <a href="#">Terms and Conditions</a>
+          </div>
         </div>
       </footer>
     </div>

@@ -1,14 +1,17 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { collection, query, orderBy, onSnapshot } from "firebase/firestore"
-import { db } from "@/lib/firebase"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Calendar, User } from "lucide-react"
+import { collection, query, orderBy, onSnapshot, doc, deleteDoc } from "firebase/firestore"
+import { db, auth } from "@/lib/firebase"
+import { useAuthState } from "react-firebase-hooks/auth"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Calendar, User, Trash2 } from "lucide-react"
 
 export default function BlogList() {
   const [blogs, setBlogs] = useState([])
   const [loading, setLoading] = useState(true)
+  const [user] = useAuthState(auth)
 
   useEffect(() => {
     const q = query(collection(db, "blogs"), orderBy("timestamp", "desc"))
@@ -24,6 +27,14 @@ export default function BlogList() {
 
     return () => unsubscribe()
   }, [])
+
+  const deleteBlog = async (id) => {
+    try {
+      await deleteDoc(doc(db, "blogs", id))
+    } catch (error) {
+      console.error("Error deleting blog post: ", error)
+    }
+  }
 
   if (loading) {
     return (
@@ -67,6 +78,19 @@ export default function BlogList() {
           <CardContent>
             <p className="text-foreground leading-relaxed whitespace-pre-wrap">{blog.content}</p>
           </CardContent>
+          {user && user.uid === blog.authorId && (
+            <CardFooter>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => deleteBlog(blog.id)}
+                className="ml-auto"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete
+              </Button>
+            </CardFooter>
+          )}
         </Card>
       ))}
     </div>

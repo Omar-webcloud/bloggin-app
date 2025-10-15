@@ -1,41 +1,39 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { collection, addDoc, serverTimestamp } from "firebase/firestore"
-import { db } from "@/lib/firebase"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState } from 'react'
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
+import { db } from '@/lib/firebase'
+import { useToast } from '@/components/ui/use-toast'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function CreateBlog({ user }) {
-  const [title, setTitle] = useState("")
-  const [content, setContent] = useState("")
+  const [title, setTitle] = useState('')
+  const [content, setContent] = useState('')
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
-  const [success, setSuccess] = useState(false)
+  const { toast } = useToast()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setError("")
-    setSuccess(false)
     setLoading(true)
 
     try {
-      await addDoc(collection(db, "blogs"), {
+      await addDoc(collection(db, 'blogs'), {
         title,
         content,
         author: user.email,
+        authorId: user.uid,
         timestamp: serverTimestamp(),
       })
 
-      setTitle("")
-      setContent("")
-      setSuccess(true)
-      setTimeout(() => setSuccess(false), 3000)
+      setTitle('')
+      setContent('')
+      toast({ description: 'Blog post published successfully.' })
     } catch (err) {
-      setError(err.message)
+      toast({ variant: 'destructive', description: err.message })
     } finally {
       setLoading(false)
     }
@@ -73,10 +71,8 @@ export default function CreateBlog({ user }) {
               className="bg-background resize-none"
             />
           </div>
-          {error && <p className="text-sm text-destructive">{error}</p>}
-          {success && <p className="text-sm text-primary font-medium">Post published successfully!</p>}
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Publishing..." : "Publish Post"}
+            {loading ? 'Publishing...' : 'Publish Post'}
           </Button>
         </form>
       </CardContent>
