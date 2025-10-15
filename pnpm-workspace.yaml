@@ -1,0 +1,5 @@
+ignoredBuiltDependencies:
+  - '@firebase/util'
+  - '@tailwindcss/oxide'
+  - protobufjs
+  - sharp
