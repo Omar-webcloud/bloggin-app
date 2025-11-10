@@ -69,14 +69,22 @@ export default function Component() {
   };
 
   const handleDelete = async (postId: string) => {
-    try {
-      await deleteDoc(doc(db, "posts", postId));
-      setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
-      router.refresh();
-    } catch (error) {
-      console.error("Error deleting post:", error);
+    const postToDelete = posts.find((post) => post.id === postId)
+    if (postToDelete && user && user.uid === postToDelete.userId) {
+      try {
+        await deleteDoc(doc(db, "posts", postId))
+        setPosts((prevPosts) =>
+          prevPosts.filter((post) => post.id !== postId)
+        )
+        router.refresh()
+      } catch (error) {
+        console.error("Error deleting post:", error)
+      }
+    } else {
+      console.error("You are not authorized to delete this post.")
+      // Optionally, show an error message to the user
     }
-  };
+  }
 
   const handleEdit = (postId: string) => {
     router.push(`/edit-post/${postId}`);
@@ -138,7 +146,7 @@ export default function Component() {
                 {user?.uid === post.userId && (
                   <div className="post-card-menu">
                     <div className="dropdown">
-                      <button className="dropbtn">...</button>
+                      <button className="dropbtn">⋮</button>
                       <div className="dropdown-content">
                         <a onClick={() => handleEdit(post.id)}>Edit</a>
                         <a onClick={() => handleDelete(post.id)}>Delete</a>

@@ -6,6 +6,7 @@ import { doc, getDoc, updateDoc } from "firebase/firestore"
 import { db } from "../../../lib/firebase"
 import { useRouter, useParams } from "next/navigation"
 import BackButton from "../../../components/BackButton"
+import useAuth from "../../../hooks/useAuth"
 
 export default function EditPostPage() {
   const [title, setTitle] = useState("")
@@ -13,6 +14,7 @@ export default function EditPostPage() {
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
   const { id } = useParams()
+  const { user } = useAuth()
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -22,29 +24,40 @@ export default function EditPostPage() {
 
         if (docSnap.exists()) {
           const post = docSnap.data()
-          setTitle(post.title)
-          setDescription(post.description)
+          if (user && user.uid === post.userId) {
+            setTitle(post.title)
+            setDescription(post.description)
+          } else {
+            setError("You are not authorized to edit this post.")
+          }
         } else {
           console.log("No such document!")
         }
       }
     }
 
-    fetchPost()
-  }, [id])
+    if (user) {
+      fetchPost()
+    }
+  }, [id, user])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
 
     try {
-      if (id) {
+      if (id && user) {
         const docRef = doc(db, "posts", id as string)
-        await updateDoc(docRef, {
-          title,
-          description,
-        })
-        router.push("/my-posts")
+        const docSnap = await getDoc(docRef)
+        if (docSnap.exists() && docSnap.data().userId === user.uid) {
+          await updateDoc(docRef, {
+            title,
+            description,
+          })
+          router.push("/my-posts")
+        } else {
+          setError("You are not authorized to edit this post.")
+        }
       }
     } catch (error: any) {
       setError(error.message)
