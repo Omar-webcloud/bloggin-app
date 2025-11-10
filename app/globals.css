@@ -55,6 +55,14 @@
        color: var(--primary-foreground);
      }
      
+     /* Back Button Style */
+     .button-back {
+       padding: 0.5rem 1rem;
+       font-size: 0.9rem;
+       margin-top: -1rem;
+       margin-bottom: 1rem;
+     }
+     
      /* Minimal/Outline Button Style */
      .button-outline {
        background-color: transparent;
@@ -242,36 +250,6 @@
        font-size: 1rem;
      }
      
-     @media (max-width: 768px) {
-       .nav {
-         position: fixed;
-         top: var(--header-height);
-         left: 0;
-         right: 0;
-         bottom: 0;
-         background-color: var(--background);
-         flex-direction: column;
-         align-items: center;
-         justify-content: center;
-         gap: 2rem;
-         transform: translateX(100%);
-         transition: transform 0.3s ease-in-out;
-       }
-     
-       .nav.open {
-         transform: translateX(0);
-       }
-     
-       .menu-toggle {
-         display: block;
-       }
-     
-       button, .button {
-         padding: 0.6rem 1.2rem;
-         font-size: 0.9rem;
-       }
-     }
-     
      .my-posts-container,
      .create-post-container,
      .edit-post-container {
@@ -297,8 +275,15 @@
        display: flex;
        justify-content: space-between;
        align-items: center;
+       flex-wrap: wrap; /* Allow items to wrap to the next line */
        padding: 1rem;
        border-bottom: 1px solid #eee;
+     }
+     
+     .post-actions {
+       display: flex;
+       gap: 0.5rem;
+       flex-shrink: 0; /* Prevent the button group from shrinking */
      }
      
      .create-post-container form,
@@ -317,11 +302,68 @@
        border-radius: 4px;
      }
      
+     /* Responsive adjustments for My Posts page */
+     @media (max-width: 640px) {
+       .my-posts-container li {
+         flex-direction: column;
+         align-items: flex-start;
+         gap: 1rem;
+       }
+     
+       .post-actions {
+         width: 100%;
+       }
+     
+       .post-actions .button,
+       .post-actions button {
+         flex-grow: 1;
+         padding: 0.5rem 0.8rem;
+         font-size: 0.85rem;
+         text-align: center;
+       }
+     }
+     
+     /* General mobile responsiveness for buttons */
+     @media (max-width: 768px) {
+       .nav {
+         position: fixed;
+         top: var(--header-height);
+         left: 0;
+         right: 0;
+         bottom: 0;
+         background-color: var(--background);
+         flex-direction: column;
+         align-items: center;
+         justify-content: center;
+         gap: 2rem;
+         transform: translateX(100%);
+         transition: transform 0.3s ease-in-out;
+       }
+     
+       .nav.open {
+         transform: translateX(0);
+       }
+     
+       .menu-toggle {
+         display: block;
+       }
+     
+       button, .button {
+         padding: 0.6rem 1rem;
+         font-size: 0.9rem;
+       }
+     
+       .button-back {
+         padding: 0.4rem 0.8rem;
+         font-size: 0.8rem;
+       }
+     }
+     
      /* Dropdown menu styles */
      .post-card-menu {
        position: absolute;
-       top: -3px; 
-       right: 12px;
+       top: 0px;
+       right: 15px;
        z-index: 1;
      }
      

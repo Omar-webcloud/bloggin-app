@@ -7,7 +7,7 @@ export default function BackButton() {
   const router = useRouter()
 
   return (
-    <button onClick={() => router.back()} className="back-button">
+    <button onClick={() => router.back()} className="button button-back">
       &larr; Back
     </button>
   )
