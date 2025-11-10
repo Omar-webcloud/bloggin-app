@@ -3,8 +3,9 @@
   --background: #f1e7d8;
   --foreground: #212529;
   --card-background: #f1f1f1;
-  --primary: #007bff;
+  --primary: #3D405B; /* Muted, dark grayish-indigo */
   --primary-foreground: #ffffff;
+  --primary-hover: #2C2E40; /* Darker shade for hover */
   --border: #dee2e6;
   --radius: 0.5rem;
   --header-height: 5rem;
@@ -15,8 +16,9 @@
   --background: #121212;
   --foreground: #f8f9fa;
   --card-background: #1e1e1e;
-  --primary: #0d6efd;
-  --primary-foreground: #ffffff;
+  --primary: #81B29A; /* Muted, calming green */
+  --primary-foreground: #121212; /* Dark text for contrast */
+  --primary-hover: #6D9C84; /* Darker shade for hover */
   --border: #343a40;
 }
 
@@ -32,6 +34,39 @@ body {
   padding-top: var(--header-height);
   transition: background-color 0.2s ease, color 0.2s ease;
 }
+
+button, .button {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  text-decoration: none; /* For link-styled buttons */
+  display: inline-block; /* For link-styled buttons */
+  text-align: center;
+}
+
+button:hover, .button:hover {
+  background-color: var(--primary-hover);
+  color: var(--primary-foreground);
+}
+
+/* Minimal/Outline Button Style */
+.button-outline {
+  background-color: transparent;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+}
+
+.button-outline:hover {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
 
 .container {
   max-width: 1200px;
@@ -115,6 +150,7 @@ body {
 }
 
 .post-card {
+  position: relative;
   background-color: var(--card-background);
   border-radius: var(--radius);
   overflow: hidden;
@@ -229,6 +265,11 @@ body {
   .menu-toggle {
     display: block;
   }
+
+  button, .button {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+  }
 }
 
 .my-posts-container,
@@ -276,17 +317,89 @@ body {
   border-radius: 4px;
 }
 
-button {
-  background-color: var(--primary);
-  color: var(--primary-foreground);
-  padding: 0.75rem 1.5rem;
-  border-radius: var(--radius);
-  border: none;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
+/* Dropdown menu styles */
+.post-card-menu {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1;
 }
 
-button:hover {
-  background-color: #005bb5;
+.dropbtn {
+  background-color: transparent;
+  color: var(--foreground);
+  padding: 5px;
+  font-size: 1.2rem;
+  border: none;
+  cursor: pointer;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: var(--card-background);
+  min-width: 120px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  border-radius: var(--radius);
+}
+
+.dropdown-content a {
+  color: var(--foreground);
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {
+  background-color: var(--background);
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.dropdown:hover .dropbtn {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 480px) {
+  .dropdown-content {
+    min-width: 100px;
+  }
+
+  .dropdown-content a {
+    padding: 10px 14px;
+  }
+}
+
+/* Loading spinner styles */
+.loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  grid-column: 1 / -1; /* Span across all grid columns */
+  height: 200px;
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: var(--primary);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
