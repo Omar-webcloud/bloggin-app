@@ -19,14 +19,12 @@ export default function CreatePostPage() {
 
     try {
       const user = auth.currentUser
-      if (user) {
-        await addDoc(collection(db, "posts"), {
-          title,
-          description,
-          author: user.uid,
-        })
-        router.push("/")
-      }
+      await addDoc(collection(db, "posts"), {
+        title,
+        description,
+        userId: user ? user.uid : null,
+      })
+      router.push("/")
     } catch (error: any) {
       setError(error.message)
     }

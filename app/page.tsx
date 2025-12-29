@@ -98,10 +98,11 @@ export default function Component() {
             BLOGGIN'
           </a>
           <nav className={`nav ${isMenuOpen ? "open" : ""}`}>
+            <a href="/posts">All Posts</a>
+            <a href="/create-post">Create Post</a>
             {user ? (
               <>
                 <a href="/my-posts">My Posts</a>
-                <a href="/create-post">Create Post</a>
                 <button onClick={handleLogout} className="button">
                   Log Out
                 </button>

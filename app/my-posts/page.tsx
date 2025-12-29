@@ -10,7 +10,7 @@ import BackButton from "../../components/BackButton"
 interface Post {
   id: string;
   title: string;
-  author: string;
+  userId: string;
   description: string;
 }
 
@@ -31,7 +31,7 @@ export default function MyPostsPage() {
         const querySnapshot = await getDocs(collection(db, "posts"))
         const userPosts = querySnapshot.docs
           .map((doc) => ({ id: doc.id, ...doc.data() } as Post))
-          .filter((post) => post.author === user.uid)
+          .filter((post) => post.userId === user.uid)
         setPosts(userPosts)
       }
     }

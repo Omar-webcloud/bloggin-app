@@ -24,8 +24,8 @@ export default function CreateBlog({ user }) {
       await addDoc(collection(db, 'blogs'), {
         title,
         content,
-        author: user.email,
-        authorId: user.uid,
+        author: user ? user.email : 'Anonymous',
+        authorId: user ? user.uid : null,
         timestamp: serverTimestamp(),
       })
 
