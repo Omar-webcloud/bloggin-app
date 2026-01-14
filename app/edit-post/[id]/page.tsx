@@ -11,7 +11,6 @@ import useAuth from "../../../hooks/useAuth"
 export default function EditPostPage() {
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
-  const [image, setImage] = useState("")
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
   const { id } = useParams()
@@ -34,7 +33,6 @@ export default function EditPostPage() {
           if (user && user.uid === post.userId) {
             setTitle(post.title)
             setDescription(post.description)
-            setImage(post.image || "")
           } else if (user) {
             setError("You are not authorized to edit this post.")
           }
@@ -64,7 +62,6 @@ export default function EditPostPage() {
           await updateDoc(docRef, {
             title,
             description,
-            image,
           })
           router.push("/my-posts")
         } else {
@@ -89,12 +86,6 @@ export default function EditPostPage() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
-          />
-          <input
-             type="text"
-             placeholder="Image URL"
-             value={image}
-             onChange={(e) => setImage(e.target.value)}
           />
           <textarea
             placeholder="Description"

@@ -13,24 +13,28 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import { useRouter } from "next/navigation";
-
-interface Post {
-  id: string;
-  title: string;
-  description: string;
-  userId: string;
-}
+import { Share2 } from "lucide-react";
+import ConfirmationModal from "../components/ConfirmationModal";
 
 export default function Component() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const { user } = useAuth();
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [posts, setPosts] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [postToDeleteId, setPostToDeleteId] = useState<string | null>(null);
+  const [activeMenuPostId, setActiveMenuPostId] = useState<string | null>(null);
 
   useEffect(() => {
+    const handleClickOutside = () => setActiveMenuPostId(null);
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    // ... existing fetchPosts logic ...
     const fetchPosts = async () => {
       setIsLoading(true);
       let q = query(collection(db, "posts"));
@@ -44,7 +48,7 @@ export default function Component() {
       const querySnapshot = await getDocs(q);
       const postsData = querySnapshot.docs.map((doc) => ({
         id: doc.id,
-        ...(doc.data() as Omit<Post, "id">),
+        ...doc.data(),
       }));
       setPosts(postsData);
       setIsLoading(false);
@@ -53,34 +57,22 @@ export default function Component() {
     fetchPosts();
   }, [search]);
 
-  useEffect(() => {
-    const isDark = document.documentElement.classList.contains("dark");
-    setIsDarkMode(isDark);
-  }, []);
-
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-    document.documentElement.classList.toggle("dark");
+  const handleDelete = (postId: string) => {
+      setPostToDeleteId(postId);
+      setShowDeleteModal(true);
   };
 
-  const handleLogout = async () => {
-    await signOut(auth);
-  };
+  const confirmDelete = async () => {
+    if (!postToDeleteId) return;
 
-  const handleDelete = async (postId: string) => {
-    const postToDelete = posts.find((post) => post.id === postId);
-    if (postToDelete && user && user.uid === postToDelete.userId) {
-      if (confirm("Are you sure you want to delete this post?")) {
-        try {
-          await deleteDoc(doc(db, "posts", postId));
-          setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
-          router.refresh();
-        } catch (error) {
-          console.error("Error deleting post:", error);
-        }
-      }
-    } else {
-      console.error("You are not authorized to delete this post.");
+    try {
+        await deleteDoc(doc(db, "posts", postToDeleteId));
+        setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postToDeleteId));
+        router.refresh();
+        setShowDeleteModal(false);
+        setPostToDeleteId(null);
+    } catch (error) {
+        console.error("Error deleting post:", error);
     }
   };
 
@@ -88,43 +80,20 @@ export default function Component() {
     router.push(`/edit-post/${postId}`);
   };
 
+  const formatDate = (timestamp: any) => {
+    if (!timestamp) return "";
+    return new Date(timestamp.seconds * 1000).toLocaleString();
+  }
+
+  const handleShare = (postId: string) => {
+    const url = `${window.location.origin}/post/${postId}`;
+    navigator.clipboard.writeText(url)
+      .then(() => alert("Link copied to clipboard!"))
+      .catch((err) => console.error("Failed to copy: ", err));
+  };
+
   return (
-    <div className={isDarkMode ? "dark" : ""}>
-      <header className="header">
-        <div className="container">
-          <a href="/" className="logo">
-            BLOGGIN'
-          </a>
-          <nav className={`nav ${isMenuOpen ? "open" : ""}`}>
-            {user ? (
-              <>
-                <a href="/posts">All Posts</a>
-                <a href="/create-post">Create Post</a>
-                <a href="/my-posts">My Posts</a>
-                <button onClick={handleLogout} className="button">
-                  Log Out
-                </button>
-              </>
-            ) : (
-              <>
-                <a href="/login">Log in</a>
-                <a href="/signup" className="button">
-                  Sign up
-                </a>
-              </>
-            )}
-            <button onClick={toggleDarkMode} className="theme-toggle">
-              {isDarkMode ? "☀️" : "🌙"}
-            </button>
-          </nav>
-          <button
-            className="menu-toggle"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            {isMenuOpen ? "✕" : "☰"}
-          </button>
-        </div>
-      </header>
+    <div className="">
       <main className="container">
         <div className="search-container">
           <input
@@ -145,24 +114,72 @@ export default function Component() {
                 {user && user.uid === post.userId && (
                   <div className="post-card-menu">
                     <div className="dropdown">
-                      <button className="dropbtn">⋮</button>
-                      <div className="dropdown-content">
-                        <a onClick={() => handleEdit(post.id)}>Edit</a>
-                        <a onClick={() => handleDelete(post.id)}>Delete</a>
-                      </div>
+                      <button 
+                        className="dropbtn" 
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            e.nativeEvent.stopImmediatePropagation(); // Prevent document listener from firing
+                            setActiveMenuPostId(activeMenuPostId === post.id ? null : post.id);
+                        }}
+                      >
+                        ⋮
+                      </button>
+                      {activeMenuPostId === post.id && (
+                          <div className="dropdown-content" style={{ display: 'block', position: 'absolute', right: 0, zIndex: 10 }}>
+                            <div 
+                                onClick={(e) => { e.stopPropagation(); handleEdit(post.id); }}
+                                style={{ padding: '12px 16px', cursor: 'pointer', display: 'block', textDecoration: 'none', color: 'inherit' }}
+                            >
+                                Edit
+                            </div>
+                            <div 
+                                onClick={(e) => { e.stopPropagation(); handleDelete(post.id); }}
+                                style={{ padding: '12px 16px', cursor: 'pointer', display: 'block', textDecoration: 'none', color: 'inherit' }}
+                            >
+                                Delete
+                            </div>
+                          </div>
+                      )}
                     </div>
                   </div>
                 )}
+                {/* Images removed as requested */}
                 <div className="post-content">
                   <h2>{post.title}</h2>
+                  <div style={{ fontSize: "0.8rem", color: "#666", marginBottom: "0.5rem" }}>
+                    <span>By {post.username || "Unknown"}</span>
+                    {" • "}
+                    <span>{formatDate(post.createdAt)}</span>
+                  </div>
                   <p>{post.description}</p>
-                  <a href={`/post/${post.id}`}>Read More</a>
+                  
+                  <div className="post-card-footer">
+                    <a href={`/post/${post.id}`}>Full Blog</a>
+                    <button 
+                        onClick={() => handleShare(post.id)} 
+                        className="share-btn"
+                        style={{ 
+                            background: 'none', 
+                            border: 'none', 
+                            cursor: 'pointer', 
+                            color: 'var(--primary)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            padding: '0.5rem',
+                            fontSize: '0.9rem'
+                        }}
+                    >
+                        Share <Share2 size={16} />
+                    </button>
+                  </div>
                 </div>
               </div>
             ))
           )}
         </section>
       </main>
+
       <footer className="footer">
         <div className="container">
           <p>&copy; BLOGGIN App by Omar. All rights reserved.</p>
@@ -172,6 +189,17 @@ export default function Component() {
           </div>
         </div>
       </footer>
+      
+      <ConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={confirmDelete}
+        title="Delete Post?"
+        message="Are you sure you want to delete this post? This action cannot be undone."
+        confirmLabel="Delete"
+        icon="trash"
+        type="danger"
+      />
     </div>
   );
 }

@@ -2,7 +2,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { collection, addDoc } from "firebase/firestore"
+import { collection, addDoc, serverTimestamp } from "firebase/firestore"
 import { db } from "../../lib/firebase"
 import { useRouter } from "next/navigation"
 import BackButton from "../../components/BackButton"
@@ -11,7 +11,6 @@ import useAuth from "../../hooks/useAuth"
 export default function CreatePostPage() {
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
-  const [image, setImage] = useState("")
   const [error, setError] = useState<string | null>(null)
   const { user, loading } = useAuth()
   const router = useRouter()
@@ -34,8 +33,9 @@ export default function CreatePostPage() {
       await addDoc(collection(db, "posts"), {
         title,
         description,
-        image,
         userId: user.uid,
+        username: user.displayName || "Anonymous",
+        createdAt: serverTimestamp(),
       })
       router.push("/")
     } catch (error: any) {
@@ -56,12 +56,6 @@ export default function CreatePostPage() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
-          />
-          <input
-            type="text"
-            placeholder="Image URL (optional)"
-            value={image}
-            onChange={(e) => setImage(e.target.value)}
           />
           <textarea
             placeholder="Description"

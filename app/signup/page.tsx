@@ -2,11 +2,13 @@
 "use client"
 
 import { useState } from "react"
-import { auth } from "../../lib/firebase"
-import { createUserWithEmailAndPassword } from "firebase/auth"
+import { auth, db } from "../../lib/firebase"
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth"
+import { doc, getDoc, setDoc } from "firebase/firestore"
 import { useRouter } from "next/navigation"
 
 export default function SignupPage() {
+  const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -18,12 +20,32 @@ export default function SignupPage() {
     setError(null)
 
     if (password !== confirmPassword) {
-      setError("Passwords don'''t match")
+      setError("Passwords don't match")
       return
     }
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password)
+      // Check if username exists
+      const usernameDoc = await getDoc(doc(db, "usernames", username))
+      if (usernameDoc.exists()) {
+        setError("Username is already taken. Please choose another one.")
+        return
+      }
+
+      // Create auth user
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+      const user = userCredential.user
+
+      // Update profile
+      await updateProfile(user, {
+        displayName: username
+      })
+
+      // Reserve username
+      await setDoc(doc(db, "usernames", username), {
+        uid: user.uid
+      })
+
       router.push("/")
     } catch (error: any) {
       setError(error.message)
@@ -36,6 +58,13 @@ export default function SignupPage() {
         <h1>Sign Up</h1>
         {error && <p style={{ color: "red" }}>{error}</p>}
         <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            placeholder="Username (Unique)"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
           <input
             type="email"
             placeholder="Email"
