@@ -11,10 +11,17 @@ import useAuth from "../../../hooks/useAuth"
 export default function EditPostPage() {
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
+  const [image, setImage] = useState("")
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
   const { id } = useParams()
-  const { user } = useAuth()
+  const { user, loading } = useAuth()
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/login")
+    }
+  }, [user, loading, router])
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -27,7 +34,8 @@ export default function EditPostPage() {
           if (user && user.uid === post.userId) {
             setTitle(post.title)
             setDescription(post.description)
-          } else {
+            setImage(post.image || "")
+          } else if (user) {
             setError("You are not authorized to edit this post.")
           }
         } else {
@@ -41,6 +49,9 @@ export default function EditPostPage() {
     }
   }, [id, user])
 
+  if (loading) return <p>Loading...</p>
+  if (!user) return null
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
@@ -53,6 +64,7 @@ export default function EditPostPage() {
           await updateDoc(docRef, {
             title,
             description,
+            image,
           })
           router.push("/my-posts")
         } else {
@@ -78,11 +90,19 @@ export default function EditPostPage() {
             onChange={(e) => setTitle(e.target.value)}
             required
           />
+          <input
+             type="text"
+             placeholder="Image URL"
+             value={image}
+             onChange={(e) => setImage(e.target.value)}
+          />
           <textarea
             placeholder="Description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             required
+            rows={10}
+            style={{ minHeight: "200px", resize: "vertical" }}
           />
           <button type="submit">Update Post</button>
         </form>

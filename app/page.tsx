@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -45,7 +44,7 @@ export default function Component() {
       const querySnapshot = await getDocs(q);
       const postsData = querySnapshot.docs.map((doc) => ({
         id: doc.id,
-        ...(doc.data() as Omit<Post, 'id'>),
+        ...(doc.data() as Omit<Post, "id">),
       }));
       setPosts(postsData);
       setIsLoading(false);
@@ -69,22 +68,21 @@ export default function Component() {
   };
 
   const handleDelete = async (postId: string) => {
-    const postToDelete = posts.find((post) => post.id === postId)
+    const postToDelete = posts.find((post) => post.id === postId);
     if (postToDelete && user && user.uid === postToDelete.userId) {
-      try {
-        await deleteDoc(doc(db, "posts", postId))
-        setPosts((prevPosts) =>
-          prevPosts.filter((post) => post.id !== postId)
-        )
-        router.refresh()
-      } catch (error) {
-        console.error("Error deleting post:", error)
+      if (confirm("Are you sure you want to delete this post?")) {
+        try {
+          await deleteDoc(doc(db, "posts", postId));
+          setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
+          router.refresh();
+        } catch (error) {
+          console.error("Error deleting post:", error);
+        }
       }
     } else {
-      console.error("You are not authorized to delete this post.")
-      // Optionally, show an error message to the user
+      console.error("You are not authorized to delete this post.");
     }
-  }
+  };
 
   const handleEdit = (postId: string) => {
     router.push(`/edit-post/${postId}`);
@@ -98,10 +96,10 @@ export default function Component() {
             BLOGGIN'
           </a>
           <nav className={`nav ${isMenuOpen ? "open" : ""}`}>
-            <a href="/posts">All Posts</a>
-            <a href="/create-post">Create Post</a>
             {user ? (
               <>
+                <a href="/posts">All Posts</a>
+                <a href="/create-post">Create Post</a>
                 <a href="/my-posts">My Posts</a>
                 <button onClick={handleLogout} className="button">
                   Log Out
@@ -144,7 +142,7 @@ export default function Component() {
           ) : (
             posts.map((post) => (
               <div className="post-card" key={post.id}>
-                {user?.uid === post.userId && (
+                {user && user.uid === post.userId && (
                   <div className="post-card-menu">
                     <div className="dropdown">
                       <button className="dropbtn">⋮</button>

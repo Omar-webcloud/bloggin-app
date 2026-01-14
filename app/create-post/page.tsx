@@ -1,28 +1,41 @@
 
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { collection, addDoc } from "firebase/firestore"
-import { db, auth } from "../../lib/firebase"
+import { db } from "../../lib/firebase"
 import { useRouter } from "next/navigation"
 import BackButton from "../../components/BackButton"
+import useAuth from "../../hooks/useAuth"
 
 export default function CreatePostPage() {
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
+  const [image, setImage] = useState("")
   const [error, setError] = useState<string | null>(null)
+  const { user, loading } = useAuth()
   const router = useRouter()
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/login")
+    }
+  }, [user, loading, router])
+
+  if (loading) return <p>Loading...</p>
+
+  if (!user) return null
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
 
     try {
-      const user = auth.currentUser
       await addDoc(collection(db, "posts"), {
         title,
         description,
-        userId: user ? user.uid : null,
+        image,
+        userId: user.uid,
       })
       router.push("/")
     } catch (error: any) {
@@ -44,11 +57,19 @@ export default function CreatePostPage() {
             onChange={(e) => setTitle(e.target.value)}
             required
           />
+          <input
+            type="text"
+            placeholder="Image URL (optional)"
+            value={image}
+            onChange={(e) => setImage(e.target.value)}
+          />
           <textarea
             placeholder="Description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             required
+            rows={10}
+            style={{ minHeight: "200px", resize: "vertical" }}
           />
           <button type="submit">Create Post</button>
         </form>

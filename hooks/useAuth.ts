@@ -1,10 +1,10 @@
-
 import { useEffect, useState } from 'react';
 import { auth } from '../lib/firebase';
-import { onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged, User } from 'firebase/auth';
 
-function useAuth() {
-  const [user, setUser] = useState(null);
+export default function useAuth() {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -13,12 +13,11 @@ function useAuth() {
       } else {
         setUser(null);
       }
+      setLoading(false);
     });
 
     return () => unsubscribe();
   }, []);
 
-  return { user };
+  return { user, loading };
 }
-
-export default useAuth;
