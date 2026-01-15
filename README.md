@@ -31,6 +31,12 @@ Custom CSS with variable-based theming is used to handle global styles, responsi
 **Backend and Database**
 Firebase Authentication handles user identity, while Cloud Firestore serves as the real-time NoSQL database for storing content.
 
+
+## Live Link 
+
+bloggin-app-six.vercel.app
+
+
 ## Getting Started
 
 To run this project on your local machine, please follow the steps outlined below.
