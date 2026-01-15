@@ -34,7 +34,7 @@ Firebase Authentication handles user identity, while Cloud Firestore serves as t
 
 ## Live Link 
 
-bloggin-app-six.vercel.app
+https://bloggin-app-six.vercel.app
 
 
 ## Getting Started
