@@ -50,7 +50,17 @@ export default function Navbar() {
     router.push("/login")
   }
 
-  if (loading) return null
+  if (loading) {
+    return (
+      <nav className="navbar">
+        <div className="navbar-container">
+          <Link href="/" className="navbar-logo">
+            BLOGGIN'
+          </Link>
+        </div>
+      </nav>
+    )
+  }
 
   const isActive = (path: string) => pathname === path ? "active" : ""
 
@@ -62,13 +72,15 @@ export default function Navbar() {
         </Link>
         
         <div className="navbar-links">
-          <Link href="/" className={`nav-icon ${isActive("/")}`} title="Home">
-            <Home />
-          </Link>
+          {user && (
+            <Link href="/" className={`nav-icon ${isActive("/")}`} title="Home">
+              <Home />
+            </Link>
+          )}
 
           {user ? (
             <>
-              {/* All Posts link removed as requested */}
+
               <Link href="/create-post" className={`nav-icon ${isActive("/create-post")}`} title="Create Post">
                 <PlusSquare />
               </Link>
