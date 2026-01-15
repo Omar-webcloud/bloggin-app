@@ -78,6 +78,22 @@ button:hover,
   color: var(--primary-foreground);
 }
 
+/* Ghost Button Style */
+.button-ghost {
+  background-color: transparent;
+  color: var(--primary);
+  border: 1px solid transparent;
+}
+
+.button-ghost:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: var(--primary-hover);
+}
+
+.dark .button-ghost:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -609,4 +625,56 @@ button:hover,
 .post-body {
   white-space: pre-wrap;
   line-height: 1.6;
+}
+
+.modal-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+}
+
+.modal-icon-wrapper {
+  padding: 0.75rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.modal-description {
+  text-align: center;
+  width: 100%;
+  color: #666;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.modal-description p {
+  margin: 0;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  justify-content: center;
+}
+
+@media (max-width: 480px) {
+  .modal-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .modal-actions button {
+    width: 100%;
+  }
 }

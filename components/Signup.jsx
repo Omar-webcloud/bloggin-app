@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { createUserWithEmailAndPassword } from "firebase/auth"
 import { auth } from "@/lib/firebase"
 import { Button } from "@/components/ui/button"
@@ -67,6 +68,12 @@ export default function Signup({ onSuccess }) {
             {loading ? "Creating account..." : "Sign up"}
           </Button>
         </form>
+        <div className="mt-4 text-center text-sm">
+          Already have an account?{" "}
+          <Link href="/login" className="underline hover:text-primary">
+            Login
+          </Link>
+        </div>
       </CardContent>
     </Card>
   )

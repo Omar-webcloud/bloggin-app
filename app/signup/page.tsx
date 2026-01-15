@@ -6,6 +6,7 @@ import { auth, db } from "../../lib/firebase"
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth"
 import { doc, getDoc, setDoc } from "firebase/firestore"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 
 export default function SignupPage() {
   const [username, setUsername] = useState("")
@@ -88,6 +89,12 @@ export default function SignupPage() {
           />
           <button type="submit">Sign Up</button>
         </form>
+        <div style={{ marginTop: "1rem", textAlign: "center", fontSize: "0.9rem" }}>
+          Already have an account?{" "}
+          <Link href="/login" style={{ textDecoration: "none" }}>
+            Log in
+          </Link>
+        </div>
       </div>
     </main>
   )

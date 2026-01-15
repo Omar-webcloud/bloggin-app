@@ -5,6 +5,7 @@ import { useState } from "react"
 import { auth } from "../../lib/firebase"
 import { signInWithEmailAndPassword } from "firebase/auth"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -46,6 +47,12 @@ export default function LoginPage() {
           />
           <button type="submit">Log In</button>
         </form>
+        <div style={{ marginTop: "1rem", textAlign: "center", fontSize: "0.9rem" }}>
+          New to Bloggin&apos; ?{" "}
+          <Link href="/signup" style={{ textDecoration: "none" }}>
+            Sign Up
+          </Link>
+        </div>
       </div>
     </main>
   )

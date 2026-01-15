@@ -81,8 +81,8 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <Link href="/login" className={`nav-icon ${isActive("/login")}`} title="Log In">
-                <LogIn />
+              <Link href="/login" className="button button-ghost" title="Log In">
+                Log In
               </Link>
               <Link href="/signup" className="button button-sm signup-btn">
                 Sign Up

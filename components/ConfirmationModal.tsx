@@ -1,6 +1,8 @@
 "use client"
 
 import { AlertTriangle, LogOut, Trash2 } from "lucide-react"
+import { useEffect, useState } from "react"
+import { createPortal } from "react-dom"
 
 interface ConfirmationModalProps {
   isOpen: boolean
@@ -25,7 +27,19 @@ export default function ConfirmationModal({
   type = "danger",
   icon = "alert"
 }: ConfirmationModalProps) {
-  if (!isOpen) return null
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+    }
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [isOpen])
+
+  if (!mounted || !isOpen) return null
 
   const getIcon = () => {
     switch(icon) {
@@ -35,28 +49,23 @@ export default function ConfirmationModal({
     }
   }
 
-  return (
+  return createPortal(
     <div className="modal-overlay">
       <div className="modal-content">
         
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '1rem' }}>
-          <div style={{ padding: '0.75rem', backgroundColor: type === 'danger' ? 'rgba(220, 53, 69, 0.1)' : 'rgba(0,0,0,0.05)', borderRadius: '50%' }}>
+        <div className="modal-inner">
+          <div className="modal-icon-wrapper" style={{ backgroundColor: type === 'danger' ? 'rgba(220, 53, 69, 0.1)' : 'rgba(0,0,0,0.05)' }}>
             {getIcon()}
           </div>
           
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', margin: 0 }}>{title}</h2>
+          <h2 className="modal-title">{title}</h2>
           
-          <div style={{ 
-              textAlign: 'center', 
-              width: '100%', 
-              color: '#666',
-              fontSize: '0.95rem' 
-          }}>
-            <p style={{ margin: 0 }}>{message}</p>
+          <div className="modal-description">
+            <p>{message}</p>
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem', justifyContent: 'center' }}>
+        <div className="modal-actions">
           <button 
             onClick={onClose}
             className="button-outline"
@@ -80,6 +89,7 @@ export default function ConfirmationModal({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
