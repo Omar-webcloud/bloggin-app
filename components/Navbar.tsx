@@ -93,10 +93,10 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <Link href="/login" className="inline-block border border-transparent hover:bg-black/5 dark:hover:bg-white/10 text-primary px-4 py-2 rounded-lg transition-colors font-medium" title="Log In">
+              <Link href="/login" className="inline-block border border-transparent hover:bg-black/5 dark:hover:bg-white/10 text-primary px-3 py-1.5 text-sm lg:px-4 lg:py-2 lg:text-base rounded-lg transition-colors font-medium" title="Log In">
                 Log In
               </Link>
-              <Link href="/signup" className="inline-block bg-primary text-primary-foreground px-4 py-2 rounded-lg transition-colors font-medium hover:bg-primary/90 ml-2 text-sm">
+              <Link href="/signup" className="inline-block bg-primary text-primary-foreground px-3 py-1.5 text-xs lg:px-4 lg:py-2 lg:text-sm rounded-lg transition-colors font-medium hover:bg-primary/90 ml-2">
                 Sign Up
               </Link>
             </>
