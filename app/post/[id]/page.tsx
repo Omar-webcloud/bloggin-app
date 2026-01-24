@@ -7,9 +7,11 @@ import { db } from "../../../lib/firebase"
 import { useParams } from "next/navigation"
 import BackButton from "../../../components/BackButton"
 import { Share2 } from "lucide-react"
+import ShareModal from "../../../components/ShareModal"
 
 export default function PostPage() {
   const [post, setPost] = useState<any>(null)
+  const [showShareModal, setShowShareModal] = useState(false)
   const { id } = useParams()
 
   useEffect(() => {
@@ -20,7 +22,6 @@ export default function PostPage() {
 
         if (docSnap.exists()) {
           setPost({ id: docSnap.id, ...docSnap.data() })
-        } else {
         }
       }
     }
@@ -34,13 +35,6 @@ export default function PostPage() {
             <div className="animate-spin rounded-full h-8 w-8 border-4 border-gray-200 border-l-primary"></div>
         </div>
     )
-  }
-
-  const handleShare = () => {
-      const url = `https://bloggin-app-six.vercel.app/post/${id}`;
-      navigator.clipboard.writeText(url)
-        .then(() => alert("Link copied to clipboard!"))
-        .catch((err) => console.error("Failed to copy: ", err));
   }
 
   return (
@@ -58,13 +52,19 @@ export default function PostPage() {
         
         <div className="mt-8 pt-6 border-t border-border">
              <button 
-                onClick={handleShare} 
+                onClick={() => setShowShareModal(true)} 
                 className="flex items-center gap-2 px-4 py-2 border border-primary text-primary rounded hover:bg-primary hover:text-primary-foreground transition-colors text-sm font-medium"
             >
                 Share this post <Share2 size={16} />
             </button>
         </div>
       </div>
+
+      <ShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        postId={id as string}
+      />
     </main>
   )
 }
