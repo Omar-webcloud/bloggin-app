@@ -13,26 +13,19 @@ export default function DeleteAccountModal({ isOpen, onClose, onConfirm }: Delet
   if (!isOpen) return null
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
+      <div className="bg-card from-card to-card/95 border border-border rounded-lg shadow-2xl w-full max-w-[400px] p-6 animate-[fadeIn_0.2s_ease-out]">
         
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '1rem' }}>
-          <div style={{ padding: '0.75rem', backgroundColor: 'rgba(220, 53, 69, 0.1)', borderRadius: '50%' }}>
-            <AlertTriangle className="w-8 h-8" style={{ color: '#dc3545', width: '2rem', height: '2rem' }} />
+        <div className="flex flex-col items-center text-center gap-4">
+          <div className="p-3 rounded-full bg-red-500/10 flex items-center justify-center">
+            <AlertTriangle className="w-8 h-8 text-red-500" />
           </div>
           
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', margin: 0 }}>Delete Account?</h2>
+          <h2 className="text-xl font-bold m-0">Delete Account?</h2>
           
-          <div style={{ 
-              textAlign: 'left', 
-              width: '100%', 
-              backgroundColor: 'rgba(0,0,0,0.05)', 
-              padding: '1rem', 
-              borderRadius: 'var(--radius)',
-              fontSize: '0.9rem' 
-          }}>
-            <p style={{ fontWeight: '600', color: '#dc3545', marginBottom: '0.5rem' }}>Warning: This action is permanent.</p>
-            <ul style={{ paddingLeft: '1.5rem', margin: 0, listStyle: 'disc' }}>
+          <div className="text-left w-full bg-black/5 dark:bg-white/5 p-4 rounded-lg text-sm">
+            <p className="font-semibold text-red-500 mb-2 m-0">Warning: This action is permanent.</p>
+            <ul className="pl-6 m-0 list-disc space-y-1">
               <li>Your profile will be permanently deleted.</li>
               <li>Your unique username will be released.</li>
               <li>All your published posts will be erased.</li>
@@ -41,25 +34,16 @@ export default function DeleteAccountModal({ isOpen, onClose, onConfirm }: Delet
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem', justifyContent: 'flex-end' }}>
+        <div className="flex gap-3 mt-6 justify-end">
           <button 
             onClick={onClose}
-            className="button-outline"
-            style={{ fontSize: '0.9rem', padding: '0.5rem 1rem' }}
+            className="px-4 py-2 border border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded-lg transition-colors text-sm font-medium"
           >
             Cancel
           </button>
           <button 
             onClick={onConfirm}
-            className="button"
-            style={{ 
-                backgroundColor: '#dc3545', 
-                color: 'white', 
-                fontSize: '0.9rem', 
-                padding: '0.5rem 1rem', 
-                border: 'none',
-                boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
-            }}
+            className="px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded-lg shadow-sm transition-colors text-sm font-medium border-none"
           >
             Yes, Delete My Account
           </button>

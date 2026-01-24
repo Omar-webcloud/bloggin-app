@@ -36,8 +36,6 @@ export default function EditPostPage() {
           } else if (user) {
             setError("You are not authorized to edit this post.")
           }
-        } else {
-          console.log("No such document!")
         }
       }
     }
@@ -74,18 +72,19 @@ export default function EditPostPage() {
   }
 
   return (
-    <main className="container">
+    <main className="container mx-auto px-4 max-w-3xl py-8">
       <BackButton />
-      <div className="edit-post-container">
-        <h1>Edit Post</h1>
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <form onSubmit={handleSubmit}>
+      <div className="bg-card border border-border rounded-lg p-8 shadow-sm">
+        <h1 className="text-2xl font-bold mb-6 text-center">Edit Post</h1>
+        {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <input
             type="text"
             placeholder="Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
+            className="w-full p-3 rounded-lg border border-input bg-background focus:ring-2 focus:ring-primary focus:outline-none"
           />
           <textarea
             placeholder="Description"
@@ -93,9 +92,9 @@ export default function EditPostPage() {
             onChange={(e) => setDescription(e.target.value)}
             required
             rows={10}
-            style={{ minHeight: "200px", resize: "vertical" }}
+            className="w-full p-3 rounded-lg border border-input bg-background focus:ring-2 focus:ring-primary focus:outline-none min-h-[200px] resize-y"
           />
-          <button type="submit">Update Post</button>
+          <button type="submit" className="w-full bg-primary text-primary-foreground p-3 rounded-lg font-medium hover:bg-primary/90 transition-colors mt-2">Update Post</button>
         </form>
       </div>
     </main>

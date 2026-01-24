@@ -143,41 +143,41 @@ export default function MyPostsPage() {
   if (!user) return null
 
   return (
-    <main className="container">
+    <main className="container mx-auto px-4 py-8 max-w-4xl">
       <BackButton />
-      <div className="my-posts-container">
+      <div className="bg-card border border-border rounded-lg p-6 sm:p-8 shadow-sm">
         {/* User Profile Section */}
-        <div className="profile-header">
-             <div className="user-info-section">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-8 border-b border-border mb-8 gap-4">
+             <div className="flex flex-wrap items-center gap-4 w-full sm:w-auto">
                  {isEditingUsername ? (
-                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                    <div className="flex gap-2 items-center flex-wrap w-full sm:w-auto">
                         <input 
                             type="text" 
                             value={newUsername} 
                             onChange={(e) => setNewUsername(e.target.value)}
-                            style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid #ccc' }}
+                            className="p-2 rounded border border-input bg-background text-foreground"
                         />
-                        <button className="button" style={{ padding: '0.5rem' }} onClick={handleUpdateUsername}>Save</button>
-                        <button className="button-outline" style={{ padding: '0.5rem' }} onClick={() => setIsEditingUsername(false)}>Cancel</button>
+                        <button className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors" onClick={handleUpdateUsername}>Save</button>
+                        <button className="px-4 py-2 border border-primary text-primary rounded hover:bg-primary hover:text-primary-foreground transition-colors" onClick={() => setIsEditingUsername(false)}>Cancel</button>
                     </div>
                 ) : (
                     <>
-                        <span style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>@{user.displayName || "Anonymous"}</span>
-                        <button className="button-outline" style={{ fontSize: '0.8rem', padding: '0.3rem 0.6rem' }} onClick={() => setIsEditingUsername(true)}>Edit Username</button>
+                        <span className="text-2xl font-bold">@{user.displayName || "Anonymous"}</span>
+                        <button className="text-sm px-3 py-1 border border-primary text-primary rounded hover:bg-primary hover:text-primary-foreground transition-colors" onClick={() => setIsEditingUsername(true)}>Edit Username</button>
                     </>
                 )}
-                {usernameError && <p style={{ color: 'red', fontSize: '0.8rem', width: '100%' }}>{usernameError}</p>}
+                {usernameError && <p className="text-red-500 text-xs w-full">{usernameError}</p>}
             </div>
             
             <button 
                 onClick={() => setIsDeleteModalOpen(true)}
-                style={{ backgroundColor: '#dc3545', color: 'white', padding: '0.5rem 1rem', borderRadius: '4px', border: 'none', cursor: 'pointer', fontSize: '0.9rem', whiteSpace: 'nowrap' }}
+                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors text-sm font-medium w-full sm:w-auto"
             >
                 Delete Account
             </button>
         </div>
 
-        <h1>My Posts</h1>
+        <h1 className="text-2xl font-bold mb-6 text-center sm:text-left">My Posts</h1>
         
         <DeleteAccountModal 
             isOpen={isDeleteModalOpen}
@@ -186,21 +186,21 @@ export default function MyPostsPage() {
         />
 
         {posts.length > 0 ? (
-           <ul>
+           <ul className="space-y-4">
              {posts.map((post) => (
-               <li key={post.id}>
-                 <span>{post.title}</span>
-                 <div className="post-actions">
-                   <Link href={`/edit-post/${post.id}`}>
-                     <button>Edit</button>
+               <li key={post.id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 border-b border-border last:border-0 gap-4">
+                 <span className="font-medium text-lg">{post.title}</span>
+                 <div className="flex gap-2 w-full sm:w-auto">
+                   <Link href={`/edit-post/${post.id}`} className="flex-1 sm:flex-none">
+                     <button className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors w-full sm:w-auto">Edit</button>
                    </Link>
-                   <button onClick={() => handleDelete(post.id)}>Delete</button>
+                   <button onClick={() => handleDelete(post.id)} className="px-4 py-2 bg-destructive text-destructive-foreground rounded hover:bg-destructive/90 transition-colors flex-1 sm:flex-none">Delete</button>
                  </div>
                </li>
              ))}
            </ul>
         ) : (
-           <p>You haven't created any posts yet.</p>
+           <p className="text-muted-foreground">You haven't created any posts yet.</p>
         )}
       </div>
 

@@ -44,18 +44,19 @@ export default function CreatePostPage() {
   }
 
   return (
-    <main className="container">
+    <main className="container mx-auto px-4 max-w-3xl py-8">
       <BackButton />
-      <div className="create-post-container">
-        <h1>Create Post</h1>
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <form onSubmit={handleSubmit}>
+      <div className="bg-card border border-border rounded-lg p-8 shadow-sm">
+        <h1 className="text-2xl font-bold mb-6 text-center">Create Post</h1>
+        {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <input
             type="text"
             placeholder="Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
+            className="w-full p-3 rounded-lg border border-input bg-background focus:ring-2 focus:ring-primary focus:outline-none"
           />
           <textarea
             placeholder="Description"
@@ -63,9 +64,9 @@ export default function CreatePostPage() {
             onChange={(e) => setDescription(e.target.value)}
             required
             rows={10}
-            style={{ minHeight: "200px", resize: "vertical" }}
+            className="w-full p-3 rounded-lg border border-input bg-background focus:ring-2 focus:ring-primary focus:outline-none min-h-[200px] resize-y"
           />
-          <button type="submit">Create Post</button>
+          <button type="submit" className="w-full bg-primary text-primary-foreground p-3 rounded-lg font-medium hover:bg-primary/90 transition-colors mt-2">Create Post</button>
         </form>
       </div>
     </main>

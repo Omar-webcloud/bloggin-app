@@ -21,7 +21,6 @@ export default function PostPage() {
         if (docSnap.exists()) {
           setPost({ id: docSnap.id, ...docSnap.data() })
         } else {
-          console.log("No such document!")
         }
       }
     }
@@ -30,47 +29,37 @@ export default function PostPage() {
   }, [id])
 
   if (!post) {
-    return <div>Loading...</div>
+    return (
+        <div className="flex justify-center items-center h-[50vh]">
+            <div className="animate-spin rounded-full h-8 w-8 border-4 border-gray-200 border-l-primary"></div>
+        </div>
+    )
   }
 
   const handleShare = () => {
-      const url = window.location.href;
+      const url = `https://bloggin-app-six.vercel.app/post/${id}`;
       navigator.clipboard.writeText(url)
         .then(() => alert("Link copied to clipboard!"))
         .catch((err) => console.error("Failed to copy: ", err));
   }
 
   return (
-    <main className="container">
+    <main className="container mx-auto px-4 py-8 max-w-3xl">
       <BackButton />
-      <div className="post-container">
-        <h1>{post.title}</h1>
-        <div style={{ fontSize: "0.8rem", color: "#666", marginBottom: "1rem" }}>
+      <div className="bg-card border border-border rounded-lg shadow-sm p-8 mt-6">
+        <h1 className="text-3xl font-bold mb-2">{post.title}</h1>
+        <div className="text-sm text-muted-foreground mb-6">
             <span>By {post.username || "Unknown"}</span>
             {" • "}
-             {/* Note: Timestamp conversion logic would be needed here if displaying date, 
-                 but keeping it simple as requested for now or assuming pre-formatted. 
-                 Since 'post' is raw data, we might need a helper, but I'll stick to the title/desc update first 
-                 with the Share button. */}
+             
         </div>
 
-        <p className="post-body">{post.description}</p>
+        <p className="whitespace-pre-wrap leading-relaxed text-foreground/90">{post.description}</p>
         
-        <div style={{ marginTop: '2rem', borderTop: '1px solid #eee', paddingTop: '1rem' }}>
+        <div className="mt-8 pt-6 border-t border-border">
              <button 
                 onClick={handleShare} 
-                style={{ 
-                    background: 'none', 
-                    border: '1px solid var(--primary)', 
-                    borderRadius: '4px',
-                    cursor: 'pointer', 
-                    color: 'var(--primary)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    padding: '0.5rem 1rem',
-                    fontSize: '0.9rem'
-                }}
+                className="flex items-center gap-2 px-4 py-2 border border-primary text-primary rounded hover:bg-primary hover:text-primary-foreground transition-colors text-sm font-medium"
             >
                 Share this post <Share2 size={16} />
             </button>

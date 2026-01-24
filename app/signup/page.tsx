@@ -54,17 +54,18 @@ export default function SignupPage() {
   }
 
   return (
-    <main className="container">
-      <div className="signup-container">
-        <h1>Sign Up</h1>
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <form onSubmit={handleSubmit}>
+    <main className="container mx-auto px-4 min-h-[calc(100vh-4rem)] flex items-center justify-center">
+      <div className="w-full max-w-md p-8 bg-card border border-border rounded-lg shadow-sm">
+        <h1 className="text-2xl font-bold text-center mb-6">Sign Up</h1>
+        {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <input
             type="text"
             placeholder="Username (Unique)"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
+            className="w-full p-3 rounded-lg border border-input bg-background focus:ring-2 focus:ring-primary focus:outline-none"
           />
           <input
             type="email"
@@ -72,6 +73,7 @@ export default function SignupPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+             className="w-full p-3 rounded-lg border border-input bg-background focus:ring-2 focus:ring-primary focus:outline-none"
           />
           <input
             type="password"
@@ -79,6 +81,7 @@ export default function SignupPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+             className="w-full p-3 rounded-lg border border-input bg-background focus:ring-2 focus:ring-primary focus:outline-none"
           />
           <input
             type="password"
@@ -86,12 +89,13 @@ export default function SignupPage() {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
+             className="w-full p-3 rounded-lg border border-input bg-background focus:ring-2 focus:ring-primary focus:outline-none"
           />
-          <button type="submit">Sign Up</button>
+          <button type="submit" className="w-full bg-primary text-primary-foreground p-3 rounded-lg font-medium hover:bg-primary/90 transition-colors">Sign Up</button>
         </form>
-        <div style={{ marginTop: "1rem", textAlign: "center", fontSize: "0.9rem" }}>
+        <div className="mt-4 text-center text-sm text-muted-foreground">
           Already have an account?{" "}
-          <Link href="/login" style={{ textDecoration: "none" }}>
+          <Link href="/login" className="text-primary hover:underline">
             Log in
           </Link>
         </div>

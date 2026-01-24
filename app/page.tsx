@@ -11,21 +11,39 @@ import {
   where,
   doc,
   deleteDoc,
+  orderBy,
 } from "firebase/firestore";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Share2 } from "lucide-react";
 import ConfirmationModal from "../components/ConfirmationModal";
+import HelpModal from "../components/HelpModal";
+import TermsModal from "../components/TermsModal";
+import ShareModal from "../components/ShareModal";
+
+interface Post {
+  id: string;
+  title: string;
+  description: string;
+  userId: string;
+  username?: string;
+  createdAt: any;
+}
 
 export default function Component() {
   const { user } = useAuth();
-  const [posts, setPosts] = useState<any[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showHelpModal, setShowHelpModal] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const [postToDeleteId, setPostToDeleteId] = useState<string | null>(null);
   const [activeMenuPostId, setActiveMenuPostId] = useState<string | null>(null);
+  const [sharePostId, setSharePostId] = useState<string | null>(null);
 
   useEffect(() => {
     const handleClickOutside = () => setActiveMenuPostId(null);
@@ -34,10 +52,9 @@ export default function Component() {
   }, []);
 
   useEffect(() => {
-    // ... existing fetchPosts logic ...
     const fetchPosts = async () => {
       setIsLoading(true);
-      let q = query(collection(db, "posts"));
+      let q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
       if (search) {
         q = query(
           collection(db, "posts"),
@@ -48,7 +65,7 @@ export default function Component() {
       const querySnapshot = await getDocs(q);
       const postsData = querySnapshot.docs.map((doc) => ({
         id: doc.id,
-        ...doc.data(),
+        ...(doc.data() as Omit<Post, 'id'>),
       }));
       setPosts(postsData);
       setIsLoading(false);
@@ -86,89 +103,90 @@ export default function Component() {
   }
 
   const handleShare = (postId: string) => {
-    const url = `${window.location.origin}/post/${postId}`;
-    navigator.clipboard.writeText(url)
-      .then(() => alert("Link copied to clipboard!"))
-      .catch((err) => console.error("Failed to copy: ", err));
+    setSharePostId(postId);
+    setShowShareModal(true);
   };
 
   return (
-    <div className="">
-      <main className="container">
-        <div className="search-container">
+    <div className="min-h-screen flex flex-col">
+      <main className="container mx-auto px-4 flex-grow">
+        <div className="my-8">
           <input
             type="search"
             placeholder="Search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            className="w-full p-4 rounded-lg border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
-        <section className="post-grid">
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {isLoading ? (
-            <div className="loader-container">
-              <div className="spinner"></div>
+            <div className="col-span-full flex justify-center items-center h-48">
+              <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-200 border-l-primary"></div>
             </div>
           ) : (
             posts.map((post) => (
-              <div className="post-card" key={post.id}>
+              <div className="relative bg-card rounded-lg overflow-hidden shadow-md hover:-translate-y-1 hover:shadow-lg transition-all flex flex-col group" key={post.id}>
                 {user && user.uid === post.userId && (
-                  <div className="post-card-menu">
-                    <div className="dropdown">
+                  <div className="absolute top-0 right-4 z-10">
+                    <div className="relative inline-block text-left">
                       <button 
-                        className="dropbtn" 
+                        className="text-2xl p-2 bg-transparent text-foreground hover:bg-black/10 rounded-full transition-colors leading-none" 
                         onClick={(e) => {
                             e.stopPropagation();
-                            e.nativeEvent.stopImmediatePropagation(); // Prevent document listener from firing
+                            e.nativeEvent.stopImmediatePropagation();
                             setActiveMenuPostId(activeMenuPostId === post.id ? null : post.id);
                         }}
                       >
                         ⋮
                       </button>
                       {activeMenuPostId === post.id && (
-                          <div className="dropdown-content" style={{ display: 'block', position: 'absolute', right: 0, zIndex: 10 }}>
-                            <div 
-                                onClick={(e) => { e.stopPropagation(); handleEdit(post.id); }}
-                                style={{ padding: '12px 16px', cursor: 'pointer', display: 'block', textDecoration: 'none', color: 'inherit' }}
-                            >
-                                Edit
-                            </div>
-                            <div 
-                                onClick={(e) => { e.stopPropagation(); handleDelete(post.id); }}
-                                style={{ padding: '12px 16px', cursor: 'pointer', display: 'block', textDecoration: 'none', color: 'inherit' }}
-                            >
-                                Delete
+                          <div className="absolute right-0 mt-2 w-32 bg-card rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-20">
+                            <div className="py-1">
+                                <div 
+                                    onClick={(e) => { e.stopPropagation(); handleEdit(post.id); }}
+                                    className="block px-4 py-2 text-sm text-foreground hover:bg-muted cursor-pointer"
+                                >
+                                    Edit
+                                </div>
+                                <div 
+                                    onClick={(e) => { e.stopPropagation(); handleDelete(post.id); }}
+                                    className="block px-4 py-2 text-sm text-foreground hover:bg-muted cursor-pointer"
+                                >
+                                    Delete
+                                </div>
                             </div>
                           </div>
                       )}
                     </div>
                   </div>
                 )}
-                {/* Images removed as requested */}
-                <div className="post-content">
-                  <h2>{post.title}</h2>
-                  <div style={{ fontSize: "0.8rem", color: "#666", marginBottom: "0.5rem" }}>
+                
+                <div className="p-6 flex flex-col flex-1">
+                  <h2 className="text-xl font-bold mb-2">{post.title}</h2>
+                  <div className="text-xs text-muted-foreground mb-4">
                     <span>By {post.username || "Unknown"}</span>
                     {" • "}
                     <span>{formatDate(post.createdAt)}</span>
                   </div>
-                  <p>{post.description}</p>
+                  <p 
+                    className="mb-4 text-muted-foreground flex-grow whitespace-pre-wrap overflow-hidden relative"
+                    style={{ 
+                        height: '6rem', 
+                        maskImage: 'linear-gradient(180deg, #000 60%, transparent)',
+                        WebkitMaskImage: 'linear-gradient(180deg, #000 60%, transparent)'
+                    }}
+                  >
+                    {post.description}
+                  </p>
                   
-                  <div className="post-card-footer">
-                    <a href={`/post/${post.id}`}>Full Blog</a>
+                  <div className="mt-auto flex justify-between items-center pt-4 border-t border-border">
+                    <Link href={`/post/${post.id}`} className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors">
+                      Full Blog
+                    </Link>
                     <button 
                         onClick={() => handleShare(post.id)} 
-                        className="share-btn"
-                        style={{ 
-                            background: 'none', 
-                            border: 'none', 
-                            cursor: 'pointer', 
-                            color: 'var(--primary)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.5rem',
-                            padding: '0.5rem',
-                            fontSize: '0.9rem'
-                        }}
+                        className="flex items-center gap-2 p-2 text-primary hover:bg-primary/10 rounded-lg transition-colors text-sm"
                     >
                         Share <Share2 size={16} />
                     </button>
@@ -180,13 +198,23 @@ export default function Component() {
         </section>
       </main>
 
-      <footer className="footer">
-        <div className="container">
-          <p>&copy; BLOGGIN App by Omar. All rights reserved.</p>
-          <div className="footer-links">
-            <a href="#">Help</a>
-            <a href="#">Terms and Conditions</a>
+      <footer className="mt-16 py-8 border-t border-border text-center">
+        <div className="container mx-auto px-4">
+          <div className="flex justify-center gap-4 mb-4">
+            <button 
+                onClick={() => setShowHelpModal(true)} 
+                className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+                Help
+            </button>
+            <button 
+                onClick={() => setShowTermsModal(true)} 
+                className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+                Terms and Conditions
+            </button>
           </div>
+          <p className="text-muted-foreground">&copy; BLOGGIN App by Omar. All rights reserved.</p>
         </div>
       </footer>
       
@@ -200,6 +228,23 @@ export default function Component() {
         icon="trash"
         type="danger"
       />
+
+      <HelpModal 
+        isOpen={showHelpModal} 
+        onClose={() => setShowHelpModal(false)} 
+      />
+      <TermsModal 
+        isOpen={showTermsModal} 
+        onClose={() => setShowTermsModal(false)} 
+      />
+      
+      {sharePostId && (
+        <ShareModal
+            isOpen={showShareModal}
+            onClose={() => setShowShareModal(false)}
+            postId={sharePostId}
+        />
+      )}
     </div>
   );
 }

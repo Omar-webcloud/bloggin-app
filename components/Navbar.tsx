@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { Home, PlusSquare, User, LogOut, LogIn, Sun, Moon } from "lucide-react"
+import { PlusSquare, User, LogOut, LogIn, Sun, Moon } from "lucide-react"
 import { useState, useEffect } from "react"
 import useAuth from "../hooks/useAuth"
 import { signOut } from "firebase/auth"
@@ -62,48 +62,51 @@ export default function Navbar() {
     )
   }
 
-  const isActive = (path: string) => pathname === path ? "active" : ""
+  const isActive = (path: string) => pathname === path ? "bg-black/5 dark:bg-white/10 text-primary" : "text-foreground hover:bg-black/5 dark:hover:bg-white/10 hover:text-primary hover:-translate-y-0.5"
 
   return (
-    <nav className="navbar">
-      <div className="navbar-container">
-        <Link href="/" className="navbar-logo">
+    <nav className="fixed top-0 left-0 right-0 h-16 bg-[#f1e7d8]/85 dark:bg-[#121212]/85 backdrop-blur-md border-b border-border z-50 transition-colors">
+      <div className="container mx-auto px-4 h-full flex items-center justify-between">
+        <Link href="/" className="text-2xl font-bold font-serif tracking-tighter text-foreground no-underline">
           BLOGGIN'
         </Link>
         
-        <div className="navbar-links">
-          {user && (
-            <Link href="/" className={`nav-icon ${isActive("/")}`} title="Home">
-              <Home />
-            </Link>
-          )}
+        <div className="flex items-center gap-4">
+
 
           {user ? (
             <>
 
-              <Link href="/create-post" className={`nav-icon ${isActive("/create-post")}`} title="Create Post">
-                <PlusSquare />
+              <Link href="/create-post" className={`p-2 rounded-lg transition-all flex items-center justify-center ${isActive("/create-post")}`} title="Create Post">
+                <PlusSquare className="w-6 h-6" />
               </Link>
-              <Link href="/my-posts" className={`nav-icon ${isActive("/my-posts")}`} title="My Posts">
-                <User />
+              <Link href="/my-posts" className={`p-2 rounded-lg transition-all flex items-center justify-center ${isActive("/my-posts")}`} title="My Posts">
+                <User className="w-6 h-6" />
               </Link>
-              <button onClick={handleLogout} className="nav-icon logout-btn" title="Log Out">
-                <LogOut />
+              <button 
+                onClick={handleLogout} 
+                className="p-2 rounded-lg transition-all flex items-center justify-center text-foreground hover:bg-black/5 dark:hover:bg-white/10 hover:text-primary hover:-translate-y-0.5" 
+                title="Log Out"
+              >
+                <LogOut className="w-6 h-6" />
               </button>
             </>
           ) : (
             <>
-              <Link href="/login" className="button button-ghost" title="Log In">
+              <Link href="/login" className="inline-block border border-transparent hover:bg-black/5 dark:hover:bg-white/10 text-primary px-4 py-2 rounded-lg transition-colors font-medium" title="Log In">
                 Log In
               </Link>
-              <Link href="/signup" className="button button-sm signup-btn">
+              <Link href="/signup" className="inline-block bg-primary text-primary-foreground px-4 py-2 rounded-lg transition-colors font-medium hover:bg-primary/90 ml-2 text-sm">
                 Sign Up
               </Link>
             </>
           )}
 
-          <button onClick={toggleDarkMode} className="nav-icon theme-btn">
-            {isDarkMode ? <Sun /> : <Moon />}
+          <button 
+            onClick={toggleDarkMode} 
+            className="p-2 rounded-lg transition-all flex items-center justify-center text-foreground hover:bg-black/5 dark:hover:bg-white/10 hover:text-primary hover:-translate-y-0.5 ml-0"
+          >
+            {isDarkMode ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
           </button>
         </div>
       </div>
