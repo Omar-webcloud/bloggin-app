@@ -65,7 +65,7 @@ export default function Navbar() {
   const isActive = (path: string) => pathname === path ? "bg-black/5 dark:bg-white/10 text-primary" : "text-foreground hover:bg-black/5 dark:hover:bg-white/10 hover:text-primary hover:-translate-y-0.5"
 
   return (
-    <nav className="fixed top-0 left-0 right-0 h-16 bg-[#f1e7d8]/85 dark:bg-[#121212]/85 backdrop-blur-md border-b border-border z-50 transition-colors">
+    <nav className="fixed top-0 left-0 right-0 h-16 bg-[#e4e1f5]/85 dark:bg-[#121212]/85 backdrop-blur-md border-b border-border z-50 transition-colors">
       <div className="container mx-auto px-4 h-full flex items-center justify-between">
         <Link href="/" className="text-2xl font-bold font-serif tracking-tighter text-foreground no-underline">
           BLOGGIN'
@@ -93,10 +93,10 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <Link href="/login" className="inline-block border border-transparent hover:bg-black/5 dark:hover:bg-white/10 text-primary px-3 py-1.5 text-sm lg:px-4 lg:py-2 lg:text-base rounded-lg transition-colors font-medium" title="Log In">
+              <Link href="/login" className="inline-block border border-transparent hover:bg-black/5 dark:hover:bg-white/10 text-primary px-2 py-1 text-center text-sm lg:px-4 lg:py-2 lg:text-base rounded-lg transition-colors font-medium" title="Log In">
                 Log In
               </Link>
-              <Link href="/signup" className="inline-block bg-primary text-primary-foreground px-3 py-1.5 text-xs lg:px-4 lg:py-2 lg:text-sm rounded-lg transition-colors font-medium hover:bg-primary/90 ml-2">
+              <Link href="/signup" className="inline-block bg-primary text-primary-foreground px-2 py-1 text-center text-xs lg:px-4 lg:py-2 lg:text-sm rounded-lg transition-colors font-medium hover:bg-primary/90 ml-2">
                 Sign Up
               </Link>
             </>
