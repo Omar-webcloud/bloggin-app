@@ -34,6 +34,8 @@ export default function BlogList() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const postsPerPage = 6;
   const router = useRouter();
   
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -104,6 +106,11 @@ export default function BlogList() {
     setShowShareModal(true);
   };
 
+  const indexOfLastPost = currentPage * postsPerPage;
+  const indexOfFirstPost = indexOfLastPost - postsPerPage;
+  const currentPosts = posts.slice(indexOfFirstPost, indexOfLastPost);
+  const totalPages = Math.ceil(posts.length / postsPerPage);
+
   return (
     <>
       <div className="my-8">
@@ -111,7 +118,10 @@ export default function BlogList() {
           type="search"
           placeholder="Search"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setCurrentPage(1);
+          }}
           className="w-full p-4 rounded-lg border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
         />
       </div>
@@ -121,7 +131,7 @@ export default function BlogList() {
             <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-200 border-l-primary"></div>
           </div>
         ) : (
-          posts.map((post) => (
+          currentPosts.map((post) => (
             <div className="relative bg-card rounded-lg overflow-hidden shadow-md hover:-translate-y-1 hover:shadow-lg transition-all flex flex-col group" key={post.id}>
               {user && user.uid === post.userId && (
                 <div className="absolute top-0 right-4 z-10">
@@ -194,6 +204,26 @@ export default function BlogList() {
           ))
         )}
       </section>
+
+      {!isLoading && totalPages > 1 && (
+        <div className="flex justify-center items-center gap-4 mt-8">
+          <button 
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="px-4 py-2 border border-border rounded-lg bg-card hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-sm text-foreground"
+          >
+            Previous
+          </button>
+          <span className="text-sm font-medium text-muted-foreground">Page {currentPage} of {totalPages}</span>
+          <button 
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 border border-border rounded-lg bg-card hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-sm text-foreground"
+          >
+            Next
+          </button>
+        </div>
+      )}
       
       <ConfirmationModal
         isOpen={showDeleteModal}
