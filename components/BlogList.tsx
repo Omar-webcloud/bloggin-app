@@ -17,6 +17,8 @@ import Link from "next/link";
 import { Share2 } from "lucide-react";
 import ConfirmationModal from "./ConfirmationModal";
 import ShareModal from "./ShareModal";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface Post {
   id: string;
@@ -163,16 +165,18 @@ export default function BlogList() {
                   {" • "}
                   <span>{formatDate(post.createdAt)}</span>
                 </div>
-                <p 
-                  className="mb-4 text-muted-foreground flex-grow whitespace-pre-wrap overflow-hidden relative"
+                <div 
+                  className="mb-4 text-muted-foreground flex-grow overflow-hidden relative prose prose-sm sm:prose-base dark:prose-invert max-w-none text-xs"
                   style={{ 
                       height: '6rem', 
                       maskImage: 'linear-gradient(180deg, #000 60%, transparent)',
                       WebkitMaskImage: 'linear-gradient(180deg, #000 60%, transparent)'
                   }}
                 >
-                  {post.description}
-                </p>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {post.description}
+                  </ReactMarkdown>
+                </div>
                 
                 <div className="mt-auto flex justify-between items-center pt-4 border-t border-border">
                   <Link href={`/post/${post.id}`} className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors">

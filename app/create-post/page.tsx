@@ -1,12 +1,13 @@
 
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { collection, addDoc, serverTimestamp } from "firebase/firestore"
 import { db } from "../../lib/firebase"
 import { useRouter } from "next/navigation"
 import BackButton from "../../components/BackButton"
 import useAuth from "../../hooks/useAuth"
+import MarkdownToolbar from "../../components/MarkdownToolbar"
 
 export default function CreatePostPage() {
   const [title, setTitle] = useState("")
@@ -14,6 +15,7 @@ export default function CreatePostPage() {
   const [error, setError] = useState<string | null>(null)
   const { user, loading } = useAuth()
   const router = useRouter()
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
     if (!loading && !user) {
@@ -58,14 +60,18 @@ export default function CreatePostPage() {
             required
             className="w-full p-3 rounded-lg border border-input bg-background focus:ring-2 focus:ring-primary focus:outline-none"
           />
-          <textarea
-            placeholder="Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            required
-            rows={10}
-            className="w-full p-3 rounded-lg border border-input bg-background focus:ring-2 focus:ring-primary focus:outline-none min-h-[200px] resize-y"
-          />
+          <div>
+            <MarkdownToolbar textareaRef={textareaRef} value={description} onChange={setDescription} />
+            <textarea
+              ref={textareaRef}
+              placeholder="Description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              required
+              rows={10}
+              className="w-full p-3 rounded-lg border border-input bg-background focus:ring-2 focus:ring-primary focus:outline-none min-h-[200px] resize-y"
+            />
+          </div>
           <button type="submit" className="w-full bg-primary text-primary-foreground p-3 rounded-lg font-medium hover:bg-primary/90 transition-colors mt-2">Create Post</button>
         </form>
       </div>

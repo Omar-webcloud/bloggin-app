@@ -8,6 +8,8 @@ import { useParams } from "next/navigation"
 import BackButton from "../../../components/BackButton"
 import { Share2 } from "lucide-react"
 import ShareModal from "../../../components/ShareModal"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 
 export default function PostPage() {
   const [post, setPost] = useState<any>(null)
@@ -48,7 +50,11 @@ export default function PostPage() {
              
         </div>
 
-        <p className="whitespace-pre-wrap leading-relaxed text-foreground/90">{post.description}</p>
+        <div className="prose prose-sm sm:prose-base dark:prose-invert max-w-none text-foreground/90">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {post.description}
+          </ReactMarkdown>
+        </div>
         
         <div className="mt-8 pt-6 border-t border-border">
              <button 
