@@ -1,43 +1,40 @@
-
-"use client"
-
-import { useEffect, useState } from "react"
 import { doc, getDoc } from "firebase/firestore"
 import { db } from "../../../lib/firebase"
-import { useParams } from "next/navigation"
 import BackButton from "../../../components/BackButton"
-import { Share2 } from "lucide-react"
-import ShareModal from "../../../components/ShareModal"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
+import PostActions from "./PostActions"
+import { notFound } from "next/navigation"
+import { Metadata } from "next"
 
-export default function PostPage() {
-  const [post, setPost] = useState<any>(null)
-  const [showShareModal, setShowShareModal] = useState(false)
-  const { id } = useParams()
-
-  useEffect(() => {
-    const fetchPost = async () => {
-      if (id) {
-        const docRef = doc(db, "posts", id as string)
-        const docSnap = await getDoc(docRef)
-
-        if (docSnap.exists()) {
-          setPost({ id: docSnap.id, ...docSnap.data() })
-        }
-      }
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params
+  const docRef = doc(db, "posts", id)
+  const docSnap = await getDoc(docRef)
+  
+  if (!docSnap.exists()) {
+    return {
+      title: "Post Not Found | Bloggin",
     }
-
-    fetchPost()
-  }, [id])
-
-  if (!post) {
-    return (
-        <div className="flex justify-center items-center h-[50vh]">
-            <div className="animate-spin rounded-full h-8 w-8 border-4 border-gray-200 border-l-primary"></div>
-        </div>
-    )
   }
+
+  const post = docSnap.data()
+  return {
+    title: `${post.title} | Bloggin`,
+    description: post.description?.substring(0, 160) || "Read this post on Bloggin App",
+  }
+}
+
+export default async function PostPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const docRef = doc(db, "posts", id)
+  const docSnap = await getDoc(docRef)
+
+  if (!docSnap.exists()) {
+    notFound()
+  }
+
+  const post = { id: docSnap.id, ...docSnap.data() } as any
 
   return (
     <main className="container mx-auto px-4 py-8 max-w-3xl">
@@ -56,21 +53,8 @@ export default function PostPage() {
           </ReactMarkdown>
         </div>
         
-        <div className="mt-8 pt-6 border-t border-border">
-             <button 
-                onClick={() => setShowShareModal(true)} 
-                className="flex items-center gap-2 px-4 py-2 border border-primary text-primary rounded hover:bg-primary hover:text-primary-foreground transition-colors text-sm font-medium"
-            >
-                Share this post <Share2 size={16} />
-            </button>
-        </div>
+        <PostActions postId={id} />
       </div>
-
-      <ShareModal
-        isOpen={showShareModal}
-        onClose={() => setShowShareModal(false)}
-        postId={id as string}
-      />
     </main>
   )
 }

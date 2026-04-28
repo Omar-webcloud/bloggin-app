@@ -1,4 +1,4 @@
-import { Bold, Italic, Heading, List, ListOrdered, Link, Code } from "lucide-react";
+import { Bold, Italic, Heading, List, ListOrdered, Link, Code, Image } from "lucide-react";
 
 interface MarkdownToolbarProps {
   textareaRef: React.RefObject<HTMLTextAreaElement | null>;
@@ -90,6 +90,14 @@ export default function MarkdownToolbar({ textareaRef, value, onChange }: Markdo
         title="Link"
       >
         <Link size={16} />
+      </button>
+      <button
+        type="button"
+        onClick={() => insertText("![alt text](", "image_url)")}
+        className="p-1.5 hover:bg-muted rounded text-muted-foreground hover:text-foreground transition-colors"
+        title="Image"
+      >
+        <Image size={16} />
       </button>
       <button
         type="button"
