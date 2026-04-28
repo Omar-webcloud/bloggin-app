@@ -56,7 +56,8 @@ export default function Navbar() {
       <nav className="navbar">
         <div className="navbar-container">
           <Link href="/" className="navbar-logo flex items-center">
-            <Image src="/logo.png" alt="Bloggin Logo" width={150} height={40} className="w-auto h-8" priority />
+            <Image src="/logo-light.png" alt="Bloggin Logo" width={150} height={40} className="w-auto h-8 dark:hidden" priority />
+            <Image src="/logo.png" alt="Bloggin Logo" width={150} height={40} className="w-auto h-8 hidden dark:block" priority />
           </Link>
         </div>
       </nav>
@@ -69,7 +70,8 @@ export default function Navbar() {
     <nav className="fixed top-0 left-0 right-0 h-16 bg-[#e4e1f5]/85 dark:bg-[#121212]/85 backdrop-blur-md border-b border-border z-50 transition-colors">
       <div className="container mx-auto px-4 h-full flex items-center justify-between">
         <Link href="/" className="flex items-center no-underline">
-          <Image src="/logo.png" alt="Bloggin Logo" width={150} height={40} className="w-auto h-8" priority />
+          <Image src="/logo-light.png" alt="Bloggin Logo" width={150} height={40} className="w-auto h-8 dark:hidden" priority />
+          <Image src="/logo.png" alt="Bloggin Logo" width={150} height={40} className="w-auto h-8 hidden dark:block" priority />
         </Link>
         
         <div className="flex items-center gap-4">
