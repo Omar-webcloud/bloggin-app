@@ -4,33 +4,37 @@
 
 @layer base {
   :root {
-    --background: #e4e1f5;
-    --foreground: #212529;
-    --card-background: #f1f1f1;
-    --primary: #3d405b;
+    --background: #f8fafc;
+    --foreground: #0f172a;
+    --card-background: #ffffff;
+    --primary: #368061;
     --primary-foreground: #ffffff;
-    --primary-hover: #2c2e40;
-    --border: #dee2e6;
+    --primary-hover: #2d664f;
+    --border: #e2e8f0;
     --muted: #f1f5f9;
     --muted-foreground: #64748b;
     --accent: #f1f5f9;
     --accent-foreground: #0f172a;
-    --radius: 0.5rem;
+    --accent-sage: #368061;
+    --accent-sage-soft: rgba(143, 216, 181, 0.2);
+    --radius: 0.75rem;
     --header-height: 4rem;
   }
 
   .dark {
-    --background: #121212;
-    --foreground: #f8f9fa;
-    --card-background: #1e1e1e;
-    --primary: #81b29a;
-    --primary-foreground: #121212;
-    --primary-hover: #6d9c84;
-    --border: #343a40;
-    --muted: #2d2d2d;
-    --muted-foreground: #94a3b8;
-    --accent: #1e293b;
-    --accent-foreground: #f8f9fa;
+    --background: #0b0c0e;
+    --foreground: #f3f4f6;
+    --card-background: #131519;
+    --primary: #8fd8b5;
+    --primary-foreground: #0b0c0e;
+    --primary-hover: #a3e6c6;
+    --border: #232730;
+    --muted: #1a1d23;
+    --muted-foreground: #9ca3af;
+    --accent: #1e242d;
+    --accent-foreground: #f3f4f6;
+    --accent-sage: #8fd8b5;
+    --accent-sage-soft: rgba(143, 216, 181, 0.12);
   }
 }
 
@@ -40,5 +44,89 @@
   }
   body {
     @apply bg-background text-foreground pt-16 transition-colors duration-200 font-sans;
+    overflow-x: hidden;
   }
+}
+
+/* Subtle radial ambient glow at top */
+.ambient-glow {
+  background: radial-gradient(circle at 50% 0%, rgba(143, 216, 181, 0.1) 0%, rgba(96, 165, 250, 0.04) 35%, transparent 70%);
+}
+
+/* Smooth bottom fade on card excerpt */
+.excerpt-mask {
+  mask-image: linear-gradient(to bottom, black 65%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 65%, transparent 100%);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.25);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.45);
+}
+
+/* Card hover lift & subtle border glow */
+.blog-card {
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.22s ease, box-shadow 0.22s ease;
+}
+.blog-card:hover {
+  transform: translateY(-3px);
+}
+.dark .blog-card:hover {
+  border-color: rgba(143, 216, 181, 0.35);
+  box-shadow: 0 14px 34px -10px rgba(0, 0, 0, 0.65), 0 0 20px -5px rgba(143, 216, 181, 0.08);
+}
+:not(.dark) .blog-card:hover {
+  border-color: rgba(54, 128, 97, 0.35);
+  box-shadow: 0 14px 30px -10px rgba(15, 23, 42, 0.08);
+}
+
+/* Hide scrollbar for category pills on mobile */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Animated Hero Keyframes */
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(1.5deg); }
+}
+@keyframes floatReverse {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(8px) rotate(-1.5deg); }
+}
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50% { opacity: 0.65; transform: scale(1.08); }
+}
+@keyframes textGradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.animate-float-slow {
+  animation: floatSlow 7s ease-in-out infinite;
+}
+.animate-float-reverse {
+  animation: floatReverse 6s ease-in-out infinite;
+}
+.animate-pulse-glow {
+  animation: pulseGlow 8s ease-in-out infinite;
+}
+.animated-gradient-text {
+  background-size: 200% auto;
+  animation: textGradientShift 5s ease infinite;
 }

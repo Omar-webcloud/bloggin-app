@@ -43,6 +43,23 @@ module.exports = {
           DEFAULT: "var(--accent)",
           foreground: "var(--accent-foreground)",
         },
+        sage: {
+          50: '#f0fdf6',
+          100: '#dcfce9',
+          200: '#bbf7d6',
+          300: '#8fd8b5',
+          400: '#6bb896',
+          500: '#4a9e7a',
+          600: '#368061',
+          700: '#2d664f',
+          800: '#275241',
+          900: '#224437',
+        },
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        serif: ['Newsreader', 'Georgia', 'serif'],
+        mono: ['JetBrains Mono', 'monospace'],
       },
       borderRadius: {
         lg: "var(--radius)",

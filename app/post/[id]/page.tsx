@@ -1,60 +1,74 @@
-import { doc, getDoc } from "firebase/firestore"
-import { db } from "../../../lib/firebase"
-import BackButton from "../../../components/BackButton"
-import ReactMarkdown from "react-markdown"
-import remarkGfm from "remark-gfm"
-import PostActions from "./PostActions"
-import { notFound } from "next/navigation"
-import { Metadata } from "next"
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../../lib/firebase";
+import { samplePosts } from "../../../lib/samplePosts";
+import { normalizePost } from "../../../lib/postUtils";
+import { notFound } from "next/navigation";
+import { Metadata } from "next";
+import PostDetailView from "../../../components/PostDetailView";
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
-  const { id } = await params
-  const docRef = doc(db, "posts", id)
-  const docSnap = await getDoc(docRef)
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
   
-  if (!docSnap.exists()) {
+  // Try firestore
+  try {
+    const docRef = doc(db, "posts", id);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      const post = docSnap.data();
+      return {
+        title: `${post.title} | Bloggin'`,
+        description: post.description?.substring(0, 160) || "Read this story on Bloggin'",
+      };
+    }
+  } catch {}
+
+  // Try sample
+  const sample = samplePosts.find((p) => p.id === id);
+  if (sample) {
     return {
-      title: "Post Not Found | Bloggin",
+      title: `${sample.title} | Bloggin'`,
+      description: sample.description?.substring(0, 160),
+    };
+  }
+
+  return {
+    title: "Story Not Found | Bloggin'",
+  };
+}
+
+export default async function PostPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+
+  let post = null;
+
+  try {
+    const docRef = doc(db, "posts", id);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      post = normalizePost(docSnap.data(), docSnap.id);
+    }
+  } catch (err) {
+    console.warn("Could not query firestore for post:", id, err);
+  }
+
+  if (!post) {
+    const sample = samplePosts.find((p) => p.id === id);
+    if (sample) {
+      post = sample;
     }
   }
 
-  const post = docSnap.data()
-  return {
-    title: `${post.title} | Bloggin`,
-    description: post.description?.substring(0, 160) || "Read this post on Bloggin App",
-  }
-}
-
-export default async function PostPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
-  const docRef = doc(db, "posts", id)
-  const docSnap = await getDoc(docRef)
-
-  if (!docSnap.exists()) {
-    notFound()
+  if (!post) {
+    notFound();
   }
 
-  const post = { id: docSnap.id, ...docSnap.data() } as any
-
-  return (
-    <main className="container mx-auto px-4 py-8 max-w-3xl">
-      <BackButton />
-      <div className="bg-card border border-border rounded-lg shadow-sm p-8 mt-6">
-        <h1 className="text-3xl font-bold mb-2">{post.title}</h1>
-        <div className="text-sm text-muted-foreground mb-6">
-            <span>By {post.username || "Unknown"}</span>
-            {" • "}
-             
-        </div>
-
-        <div className="prose prose-sm sm:prose-base dark:prose-invert max-w-none text-foreground/90">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-            {post.description}
-          </ReactMarkdown>
-        </div>
-        
-        <PostActions postId={id} />
-      </div>
-    </main>
-  )
+  return <PostDetailView post={post} />;
 }

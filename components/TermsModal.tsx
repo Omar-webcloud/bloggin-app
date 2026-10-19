@@ -1,62 +1,79 @@
-"use client"
+"use client";
 
-import { FileText } from "lucide-react"
-import { useEffect, useState } from "react"
-import { createPortal } from "react-dom"
+import { FileText, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 interface TermsModalProps {
-  isOpen: boolean
-  onClose: () => void
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-export default function TermsModal({ 
-  isOpen, 
-  onClose 
-}: TermsModalProps) {
-  const [mounted, setMounted] = useState(false)
+export default function TermsModal({ isOpen, onClose }: TermsModalProps) {
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true)
+    setMounted(true);
     if (isOpen) {
-      document.body.style.overflow = 'hidden'
+      document.body.style.overflow = "hidden";
     }
     return () => {
-      document.body.style.overflow = 'unset'
-    }
-  }, [isOpen])
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
 
-  if (!mounted || !isOpen) return null
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
+
+  if (!mounted || !isOpen) return null;
 
   return createPortal(
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
-      <div className="bg-card from-card to-card/95 border border-border rounded-lg shadow-2xl w-full max-w-[600px] p-6 animate-[fadeIn_0.2s_ease-out] flex flex-col max-h-[90vh]">
-        
-        <div className="flex flex-col items-center text-center gap-4 mb-4">
-          <div className="p-3 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-            <FileText className="w-8 h-8 text-primary" />
+    <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-md flex items-center justify-center z-[9999] p-4 animate-in fade-in duration-150">
+      <div className="bg-card border border-border rounded-2xl shadow-2xl w-full max-w-lg p-6 animate-in zoom-in-95 duration-150 flex flex-col max-h-[85vh]">
+        <div className="flex items-center justify-between pb-3 mb-4 border-b border-border">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 rounded-lg bg-sage-500/10 text-sage-600 dark:text-sage-300">
+              <FileText className="w-5 h-5" />
+            </div>
+            <h3 className="text-base font-bold text-foreground">Terms and Conditions</h3>
           </div>
-          
-          <h2 className="text-xl font-bold m-0 shrink-0">Terms and Conditions</h2>
+          <button
+            onClick={onClose}
+            className="p-1 rounded-lg text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
-          <div className="text-left w-full text-foreground/80 text-[0.95rem] space-y-4 overflow-y-auto pr-2 custom-scrollbar">
-            <p className="font-semibold">By using Bloggin you agree to these terms and conditions.</p>
-            
-            <p>You are responsible for the content you create and publish on Bloggin'. Do not post content that is illegal harmful offensive or violates the rights of others.</p>
-            
-            <p>You keep ownership of your content. By publishing on Bloggin' you allow the platform to store display and distribute your content as part of the service.</p>
-            
-            <p>Bloggin' may remove content that violates these terms or suspend accounts that misuse the platform.</p>
-            
-            <p>The service is provided as is. Bloggin' does not guarantee uninterrupted access or data preservation.</p>
-            
-            <p>These terms may be updated at any time. Continued use of Bloggin' means you accept the updated terms.</p>
-          </div>
+        <div className="text-sm text-muted-foreground space-y-3 overflow-y-auto pr-2 leading-relaxed">
+          <p className="font-semibold text-foreground">
+            By using Bloggin&apos;, you agree to these terms and guidelines.
+          </p>
+          <p>
+            All articles published on Bloggin&apos; represent the personal reflections, creative writing, and insights of their respective authors.
+          </p>
+          <p>
+            You retain full ownership of your written content. By publishing on Bloggin&apos;, you grant the platform permission to display and share your content as part of the service.
+          </p>
+          <p>
+            Please respect community members: avoid harmful, harassing, or illegal content. We reserve the right to remove any stories that violate these principles.
+          </p>
+          <p className="text-xs text-muted-foreground/80 pt-2 border-t border-border">
+            &copy; 2026 BLOGGIN App by Omar. All rights reserved.
+          </p>
+        </div>
 
-        <div className="flex gap-3 mt-6 justify-center shrink-0">
-          <button 
+        <div className="flex justify-end gap-3 mt-6 pt-3 border-t border-border shrink-0">
+          <button
             onClick={onClose}
-            className="px-6 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg shadow-sm transition-colors text-sm font-medium border-none"
+            className="px-5 py-2 bg-sage-600 hover:bg-sage-500 dark:bg-sage-300 dark:hover:bg-sage-200 text-white dark:text-slate-950 rounded-xl transition-colors text-xs font-semibold shadow-sm"
           >
             I Agree
           </button>
@@ -64,5 +81,5 @@ export default function TermsModal({
       </div>
     </div>,
     document.body
-  )
+  );
 }

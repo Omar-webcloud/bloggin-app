@@ -1,61 +1,99 @@
-"use client"
+"use client";
 
-import { Info } from "lucide-react"
-import { useEffect, useState } from "react"
-import { createPortal } from "react-dom"
+import { HelpCircle, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 interface HelpModalProps {
-  isOpen: boolean
-  onClose: () => void
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-export default function HelpModal({ 
-  isOpen, 
-  onClose 
-}: HelpModalProps) {
-  const [mounted, setMounted] = useState(false)
+export default function HelpModal({ isOpen, onClose }: HelpModalProps) {
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true)
+    setMounted(true);
     if (isOpen) {
-      document.body.style.overflow = 'hidden'
+      document.body.style.overflow = "hidden";
     }
     return () => {
-      document.body.style.overflow = 'unset'
-    }
-  }, [isOpen])
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
 
-  if (!mounted || !isOpen) return null
+  // Esc key listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
+
+  if (!mounted || !isOpen) return null;
 
   return createPortal(
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
-      <div className="bg-card from-card to-card/95 border border-border rounded-lg shadow-2xl w-full max-w-[500px] p-6 animate-[fadeIn_0.2s_ease-out]">
-        
-        <div className="flex flex-col items-center text-center gap-4">
-          <div className="p-3 rounded-full bg-primary/10 flex items-center justify-center">
-            <Info className="w-8 h-8 text-primary" />
+    <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-md flex items-center justify-center z-[9999] p-4 animate-in fade-in duration-150">
+      <div className="bg-card border border-border rounded-2xl shadow-2xl w-full max-w-lg p-6 animate-in zoom-in-95 duration-150">
+        <div className="flex items-center justify-between pb-3 mb-4 border-b border-border">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 rounded-lg bg-sage-500/10 text-sage-600 dark:text-sage-300">
+              <HelpCircle className="w-5 h-5" />
+            </div>
+            <h3 className="text-base font-bold text-foreground">Help &amp; Keyboard Shortcuts</h3>
           </div>
-          
-          <h2 className="text-xl font-bold m-0">Help</h2>
-          
-          <div className="text-center w-full text-foreground/80 text-[0.95rem] m-0 space-y-2">
-            <p>Bloggin lets you write and publish text based blog posts in a clean and simple way.</p>
-            <p>Create a post by writing in the editor and saving it when you are ready.</p>
-            <p>You can edit or delete your posts at any time.</p>
-            <p>Use Bloggin to share your thoughts clearly and without distractions.</p>
-          </div>
+          <button
+            onClick={onClose}
+            className="p-1 rounded-lg text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
-        <div className="flex gap-3 mt-6 justify-center">
-          <button 
+        <div className="text-sm text-muted-foreground space-y-4 leading-relaxed">
+          <p>
+            Welcome to <strong className="text-foreground">Bloggin&apos;</strong> — a fast, distraction-free publishing space for everyday stories, thoughts, and reflections.
+          </p>
+
+          <div className="p-4 rounded-xl bg-muted border border-border space-y-2.5 text-xs">
+            <div className="flex justify-between items-center">
+              <span className="text-foreground font-medium">Focus Search Bar</span>
+              <kbd className="font-mono px-2 py-0.5 rounded bg-card border border-border text-foreground font-semibold">
+                ⌘K / Ctrl+K
+              </kbd>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-foreground font-medium">Write New Story</span>
+              <kbd className="font-mono px-2 py-0.5 rounded bg-card border border-border text-foreground font-semibold">
+                N
+              </kbd>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-foreground font-medium">Close Reader / Modals</span>
+              <kbd className="font-mono px-2 py-0.5 rounded bg-card border border-border text-foreground font-semibold">
+                Esc
+              </kbd>
+            </div>
+          </div>
+
+          <p className="text-xs text-muted-foreground">
+            Click any card title or &ldquo;Full Blog&rdquo; button to launch the distraction-free article reader with adjustable typography sizes and reading progress indicator.
+          </p>
+        </div>
+
+        <div className="flex justify-end gap-3 mt-6 pt-3 border-t border-border">
+          <button
             onClick={onClose}
-            className="px-6 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg shadow-sm transition-colors text-sm font-medium border-none"
+            className="px-5 py-2 bg-sage-600 hover:bg-sage-500 dark:bg-sage-300 dark:hover:bg-sage-200 text-white dark:text-slate-950 rounded-xl transition-colors text-xs font-semibold shadow-sm"
           >
-            Close
+            Got It
           </button>
         </div>
       </div>
     </div>,
     document.body
-  )
+  );
 }
